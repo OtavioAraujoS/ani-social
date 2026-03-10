@@ -1,4 +1,4 @@
-import Elysia, { t } from "elysia";
+import Elysia from "elysia";
 import { UserService } from "./users.service";
 import { CreateUserSchema } from "../../interfaces/User";
 

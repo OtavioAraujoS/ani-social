@@ -1,4 +1,21 @@
 services:
+  app:
+    build:
+      context: .
+      target: debug
+    container_name: elysia_app
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    restart: unless-stopped
+
   postgres-db:
     image: postgres:18.3-alpine
     container_name: elysia_postgres
@@ -12,7 +29,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U myuser -d my_elysia_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5

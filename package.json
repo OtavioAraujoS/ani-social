@@ -10,6 +10,8 @@
     "db:studio": "bun x drizzle-kit studio"
   },
   "dependencies": {
+    "@elysiajs/cookie": "^0.8.0",
+    "@elysiajs/jwt": "^1.4.1",
     "drizzle-kit": "^0.31.9",
     "drizzle-orm": "^0.45.1",
     "elysia": "latest",

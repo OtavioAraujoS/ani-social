@@ -7,6 +7,7 @@ import {
   UpdateUserInterface,
   UpdateUserPasswordInterface,
 } from "../../interfaces/User";
+import { AuthService } from "../auth/auth.service";
 
 export const UserService = {
   findAll: async () => {
@@ -14,7 +15,14 @@ export const UserService = {
   },
 
   create: async (data: CreateUserInterface) => {
-    const [newUser] = await db.insert(users).values(data).returning();
+    const hashedPassword = await AuthService.hashPassword(data.password);
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        ...data,
+        password: hashedPassword,
+      })
+      .returning();
     return newUser;
   },
 
@@ -23,7 +31,11 @@ export const UserService = {
   },
 
   updatePassword: async ({ id, password }: UpdateUserPasswordInterface) => {
-    await db.update(users).set({ password }).where(eq(users.id, id));
+    const hashedPassword = await AuthService.hashPassword(password);
+    await db
+      .update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, id));
   },
 
   delete: async (data: DeleteUserInterface) => {

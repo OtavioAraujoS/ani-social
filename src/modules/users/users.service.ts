@@ -1,7 +1,12 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import { users } from "../../db/schema";
-import { CreateUserInterface, DeleteUserInterface, UpdateUserInterface } from "../../interfaces/User";
+import {
+  CreateUserInterface,
+  DeleteUserInterface,
+  UpdateUserInterface,
+  UpdateUserPasswordInterface,
+} from "../../interfaces/User";
 
 export const UserService = {
   findAll: async () => {
@@ -17,7 +22,11 @@ export const UserService = {
     await db.update(users).set(data).where(eq(users.id, data.id));
   },
 
-  delete: async ( data: DeleteUserInterface) => {
+  updatePassword: async ({ id, password }: UpdateUserPasswordInterface) => {
+    await db.update(users).set({ password }).where(eq(users.id, id));
+  },
+
+  delete: async (data: DeleteUserInterface) => {
     await db.delete(users).where(eq(users.id, data.id));
-  }
+  },
 };

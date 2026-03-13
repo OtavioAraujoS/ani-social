@@ -15,7 +15,7 @@ export const userController = new Elysia({ prefix: "/users" })
   .put("/", ({ body }) => UserService.update(body), {
     body: UpdateUserSchema,
   })
-  .patch("/", ({ body }) => UserService.update(body), {
+  .patch("/", ({ body }) => UserService.updatePassword(body), {
     body: UpdateUserPasswordSchema,
   })
   .delete("/", ({ body }) => UserService.delete(body), {

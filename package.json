@@ -4,7 +4,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
-    "db:up": "docker compose up -d --build",
+    "db:generate": "bun x drizzle-kit generate",
+    "db:up": "bun run db:generate && docker compose up -d --build",
     "db:down": "docker compose down",
     "db:studio": "bun x drizzle-kit studio"
   },

@@ -5,7 +5,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
     "db:generate": "bun x drizzle-kit generate",
-    "db:up": "bun run db:generate && docker compose up -d --build",
+    "db:push": "docker compose exec app bun x drizzle-kit push",
+    "db:up": "docker compose up -d postgres-db && docker compose up -d --build app && bun run db:push",
     "db:down": "docker compose down",
     "db:studio": "bun x drizzle-kit studio"
   },

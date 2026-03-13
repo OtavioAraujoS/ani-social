@@ -6,7 +6,7 @@ services:
     container_name: elysia_app
     ports:
       - "3333:3333"
-    command: sh -c "bun x drizzle-kit migrate && bun run --watch src/index.ts"
+    command: sh -c "bun run --watch src/index.ts"
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules

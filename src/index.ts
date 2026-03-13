@@ -6,7 +6,7 @@ const app = new Elysia()
 
   .group("/api", (app) => app.use(userController))
 
-  .listen(3000);
+  .listen(3333);
 
 console.log(
   `🚀 Server running at http://${app.server?.hostname}:${app.server?.port}`,

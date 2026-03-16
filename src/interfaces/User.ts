@@ -7,22 +7,29 @@ export const CreateUserSchema = t.Object({
 });
 
 export const UpdateUserSchema = t.Object({
-  id: t.String(),
+  userId: t.String(),
   name: t.String(),
   userName: t.String(),
   password: t.String(),
 });
 
 export const UpdateUserPasswordSchema = t.Object({
-  id: t.String(),
+  userId: t.String(),
   password: t.String(),
 });
 
+export const UpdateUserAvatarSchema = t.Object({
+  userId: t.String(),
+  imageBase64Path: t.String(),
+});
+
 export const DeleteUserSchema = t.Object({
-  id: t.String(),
+  userId: t.String(),
 });
 
 export type CreateUserInterface = typeof CreateUserSchema.static;
 export type UpdateUserInterface = typeof UpdateUserSchema.static;
-export type UpdateUserPasswordInterface = typeof UpdateUserPasswordSchema.static;
+export type UpdateUserPasswordInterface =
+  typeof UpdateUserPasswordSchema.static;
+export type UpdateUserAvatarInterface = typeof UpdateUserAvatarSchema.static;
 export type DeleteUserInterface = typeof DeleteUserSchema.static;

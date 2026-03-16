@@ -3,6 +3,7 @@ import { UserService } from "./users.service";
 import {
   CreateUserSchema,
   DeleteUserSchema,
+  UpdateUserAvatarSchema,
   UpdateUserPasswordSchema,
   UpdateUserSchema,
 } from "../../interfaces/User";
@@ -17,6 +18,9 @@ export const userController = new Elysia({ prefix: "/users" })
   })
   .patch("/", ({ body }) => UserService.updatePassword(body), {
     body: UpdateUserPasswordSchema,
+  })
+  .patch("/avatar", ({ body }) => UserService.updateUserAvatar(body), {
+    body: UpdateUserAvatarSchema,
   })
   .delete("/", ({ body }) => UserService.delete(body), {
     body: DeleteUserSchema,

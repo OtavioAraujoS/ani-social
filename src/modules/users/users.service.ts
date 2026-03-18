@@ -58,9 +58,18 @@ export const UserService = {
     data: UpdateUserInterface,
   ): Promise<SuccessInterface | void> => {
     try {
-      const response = await UserService.verifyUserExist(data.userId);
+      const userExist = await UserService.verifyUserExist(data.userId);
 
-      if (response) {
+      if (userExist) {
+        const userIsTheSameOrAdmin = await AuthService.userIsTheSameOrAdmin(
+          data.userId,
+          data.userLoggedId,
+        );
+
+        if (!userIsTheSameOrAdmin) {
+          throw new Error("Usuário não autorizado.");
+        }
+
         await db.update(users).set(data).where(eq(users.id, data.userId));
         return {
           message: "Usuário atualizado com sucesso!",
@@ -84,9 +93,9 @@ export const UserService = {
     password,
   }: UpdateUserPasswordInterface): Promise<SuccessInterface | void> => {
     try {
-      const response = await UserService.verifyUserExist(userId);
+      const userExist = await UserService.verifyUserExist(userId);
 
-      if (response) {
+      if (userExist) {
         const hashedPassword = await AuthService.hashPassword(password);
         await db
           .update(users)
@@ -113,9 +122,9 @@ export const UserService = {
     imageBase64Path,
   }: UpdateUserAvatarInterface) => {
     try {
-      const response = await UserService.verifyUserExist(userId);
+      const userExist = await UserService.verifyUserExist(userId);
 
-      if (response) {
+      if (userExist) {
         const uploadResult = await cloudinary.uploader.upload(imageBase64Path, {
           folder: "avatars",
           transformation: [
@@ -144,9 +153,9 @@ export const UserService = {
     userId,
   }: DeleteUserInterface): Promise<SuccessInterface | void> => {
     try {
-      const response = await UserService.verifyUserExist(userId);
+      const userExist = await UserService.verifyUserExist(userId);
 
-      if (response) {
+      if (userExist) {
         throw new Error("Usuário não encontrado ou não autorizado.", {
           cause: "Usuário não encontrado ou não autorizado.",
         });

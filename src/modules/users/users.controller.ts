@@ -7,21 +7,31 @@ import {
   UpdateUserPasswordSchema,
   UpdateUserSchema,
 } from "../../interfaces/User";
+import { adminMiddleware, authPlugin } from "../auth/auth.middleware";
 
 export const userController = new Elysia({ prefix: "/users" })
   .get("/", () => UserService.findAll())
   .post("/", ({ body }) => UserService.create(body), {
     body: CreateUserSchema,
   })
-  .put("/", ({ body }) => UserService.update(body), {
-    body: UpdateUserSchema,
-  })
-  .patch("/", ({ body }) => UserService.updatePassword(body), {
-    body: UpdateUserPasswordSchema,
-  })
-  .patch("/avatar", ({ body }) => UserService.updateUserAvatar(body), {
-    body: UpdateUserAvatarSchema,
-  })
-  .delete("/", ({ body }) => UserService.delete(body), {
-    body: DeleteUserSchema,
-  });
+
+  .group("/me", (app) =>
+    app
+      .use(authPlugin)
+      .patch("/", ({ body }) => UserService.update(body), {
+        body: UpdateUserSchema,
+      })
+      .patch("/password", ({ body }) => UserService.updatePassword(body), {
+        body: UpdateUserPasswordSchema,
+      })
+      .patch("/avatar", ({ body }) => UserService.updateUserAvatar(body), {
+        body: UpdateUserAvatarSchema,
+      }),
+  )
+  .group("/admin", (app) =>
+    app
+      .use(adminMiddleware)
+      .delete("/", ({ body }) => UserService.delete(body), {
+        body: DeleteUserSchema,
+      }),
+  );

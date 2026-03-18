@@ -38,4 +38,13 @@ export const AuthService = {
 
     return user;
   },
+
+  userIsTheSameOrAdmin: async (userId: string, userLoggedId: string) => {
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+
+    if (!user) throw new Error("Usuário não encontrado");
+
+    if (user.id === userLoggedId || user.role === "ADMIN") return true;
+    throw new Error("Usuário não autorizado");
+  },
 };

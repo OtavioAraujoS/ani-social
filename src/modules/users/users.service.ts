@@ -39,19 +39,31 @@ export const UserService = {
   },
 
   findAll: async () => {
-    return await db.select().from(users);
+    try {
+      return await db.select().from(users);
+    } catch (error) {
+      throw new Error("Não foi possível listar os usuários - " + error, {
+        cause: error,
+      });
+    }
   },
 
   create: async (data: CreateUserInterface) => {
-    const hashedPassword = await AuthService.hashPassword(data.password);
-    const [newUser] = await db
-      .insert(users)
-      .values({
-        ...data,
-        password: hashedPassword,
-      })
-      .returning();
-    return newUser;
+    try {
+      const hashedPassword = await AuthService.hashPassword(data.password);
+      const [newUser] = await db
+        .insert(users)
+        .values({
+          ...data,
+          password: hashedPassword,
+        })
+        .returning();
+      return newUser;
+    } catch (error) {
+      throw new Error("Não foi possível criar o usuário - " + error, {
+        cause: error,
+      });
+    }
   },
 
   update: async (
@@ -82,7 +94,7 @@ export const UserService = {
       });
     } catch (error) {
       console.log(error);
-      throw new Error("Não foi possível atualizar o usuário.", {
+      throw new Error("Não foi possível atualizar o usuário - " + error, {
         cause: error,
       });
     }
@@ -111,9 +123,12 @@ export const UserService = {
         cause: "Usuário não encontrado ou não autorizado.",
       });
     } catch (error) {
-      throw new Error("Não foi possível atualizar a senha do usuário.", {
-        cause: error,
-      });
+      throw new Error(
+        "Não foi possível atualizar a senha do usuário- " + error,
+        {
+          cause: error,
+        },
+      );
     }
   },
 
@@ -143,7 +158,7 @@ export const UserService = {
         cause: "Usuário não encontrado ou não autorizado.",
       });
     } catch (error) {
-      throw new Error("Não foi possível atualizar o avatar.", {
+      throw new Error("Não foi possível atualizar o avatar- " + error, {
         cause: error,
       });
     }
@@ -151,24 +166,34 @@ export const UserService = {
 
   delete: async ({
     userId,
+    userLoggedId,
   }: DeleteUserInterface): Promise<SuccessInterface | void> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 
       if (userExist) {
-        throw new Error("Usuário não encontrado ou não autorizado.", {
-          cause: "Usuário não encontrado ou não autorizado.",
-        });
+        const userIsTheSameOrAdmin = await AuthService.userIsTheSameOrAdmin(
+          userId,
+          userLoggedId,
+        );
+
+        if (!userIsTheSameOrAdmin) {
+          throw new Error("Usuário não autorizado.");
+        }
+
+        await db.delete(users).where(eq(users.id, userId));
+        return {
+          message: "Usuário deletado com sucesso!",
+          success: true,
+          code: 200,
+        };
       }
 
-      await db.delete(users).where(eq(users.id, userId));
-      return {
-        message: "Usuário deletado com sucesso!",
-        success: true,
-        code: 200,
-      };
+      throw new Error("Usuário não encontrado ou não autorizado.", {
+        cause: "Usuário não encontrado ou não autorizado.",
+      });
     } catch (error) {
-      throw new Error("Não foi possível remover o usuário.", {
+      throw new Error("Não foi possível remover o usuário - " + error, {
         cause: error,
       });
     }

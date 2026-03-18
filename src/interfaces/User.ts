@@ -4,13 +4,13 @@ export const CreateUserSchema = t.Object({
   name: t.String(),
   userName: t.String(),
   password: t.String(),
+  role: t.Optional(t.Union([t.Literal("USER"), t.Literal("ADMIN")])),
 });
 
 export const UpdateUserSchema = t.Object({
   userId: t.String(),
   name: t.String(),
   userName: t.String(),
-  password: t.String(),
   userLoggedId: t.String(),
 });
 

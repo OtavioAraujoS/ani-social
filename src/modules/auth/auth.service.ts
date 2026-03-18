@@ -40,12 +40,6 @@ export const AuthService = {
   },
 
   userIsTheSameOrAdmin: async (userId: string, userLoggedId: string) => {
-    const [targetUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, userId));
-    if (!targetUser) throw new Error("Usuário alvo não encontrado");
-
     if (userId === userLoggedId) return true;
 
     const [loggedUser] = await db

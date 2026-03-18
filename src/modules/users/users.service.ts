@@ -102,12 +102,22 @@ export const UserService = {
 
   updatePassword: async ({
     userId,
+    userLoggedId,
     password,
   }: UpdateUserPasswordInterface): Promise<SuccessInterface | void> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 
       if (userExist) {
+        const userIsTheSameOrAdmin = await AuthService.userIsTheSameOrAdmin(
+          userId,
+          userLoggedId,
+        );
+
+        if (!userIsTheSameOrAdmin) {
+          throw new Error("Usuário não autorizado.");
+        }
+
         const hashedPassword = await AuthService.hashPassword(password);
         await db
           .update(users)
@@ -134,12 +144,22 @@ export const UserService = {
 
   updateUserAvatar: async ({
     userId,
+    userLoggedId,
     imageBase64Path,
   }: UpdateUserAvatarInterface) => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 
       if (userExist) {
+        const userIsTheSameOrAdmin = await AuthService.userIsTheSameOrAdmin(
+          userId,
+          userLoggedId,
+        );
+
+        if (!userIsTheSameOrAdmin) {
+          throw new Error("Usuário não autorizado.");
+        }
+
         const uploadResult = await cloudinary.uploader.upload(imageBase64Path, {
           folder: "avatars",
           transformation: [

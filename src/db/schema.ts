@@ -6,12 +6,13 @@ import {
   pgEnum,
   integer,
 } from "drizzle-orm/pg-core";
+import { AnimeStatusEnum } from "../interfaces/Anime";
 
 export const roleEnum = pgEnum("role", ["USER", "ADMIN"]);
 export const animeStatusEnum = pgEnum("anime_status", [
-  "COMPLETED",
-  "RELEASING",
-  "PENDING",
+  AnimeStatusEnum.COMPLETED,
+  AnimeStatusEnum.RELEASING,
+  AnimeStatusEnum.PENDING,
 ]);
 
 export const users = pgTable("users", {
@@ -30,12 +31,12 @@ export const animes = pgTable("animes", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   episodes: integer("episodes").notNull(),
-  review: text("review").notNull(),
-  starts: integer("starts").notNull(),
-  imageUrl: text("image_url").notNull(),
+  review: text("review"),
+  stars: integer("stars"),
+  imageUrl: text("image_url"),
   createdByUserId: uuid("created_by_user_id").notNull(),
   updatedByUserId: uuid("updated_by_user_id").notNull(),
-  status: animeStatusEnum("status").default("PENDING"),
+  status: animeStatusEnum("status").notNull().default(AnimeStatusEnum.PENDING),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

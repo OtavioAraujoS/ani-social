@@ -2,6 +2,7 @@ import {
   AnimeListResponseInterface,
   AnimeResponseInterface,
   CreateAnimeInterface,
+  UpdateAnimeInterface,
 } from "../../interfaces/Anime";
 import { db } from "../../db";
 import { animes } from "../../db/schema";
@@ -69,6 +70,28 @@ export const AnimeService = {
       throw new Error("Anime já cadastrado");
     } catch (error) {
       throw new Error("Não foi possível cadastrar o anime - " + error, {
+        cause: error,
+      });
+    }
+  },
+
+  update: async (
+    anime: UpdateAnimeInterface,
+  ): Promise<SuccessResponseInterface> => {
+    try {
+      const duplicated = await AnimeService.duplicatedAnime(anime.title);
+
+      if (duplicated) {
+        await db.update(animes).set(anime).where(eq(animes.id, anime.animeId));
+        return {
+          message: "Anime atualizado com sucesso!",
+          success: true,
+          code: 200,
+        };
+      }
+      throw new Error("Anime não encontrado");
+    } catch (error) {
+      throw new Error("Não foi possível atualizar o anime - " + error, {
         cause: error,
       });
     }

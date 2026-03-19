@@ -5,6 +5,7 @@ import {
   AnimeListResponseSchema,
   AnimeSchema,
   CreateAnimeSchema,
+  UpdateAnimeSchema,
 } from "../../interfaces/Anime";
 import { SuccessResponseSchema } from "../../interfaces/Success";
 
@@ -24,6 +25,10 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
       })
       .post("/", ({ body }) => AnimeService.create(body), {
         body: CreateAnimeSchema,
+        response: SuccessResponseSchema,
+      })
+      .patch("/", ({ body }) => AnimeService.update(body), {
+        body: UpdateAnimeSchema,
         response: SuccessResponseSchema,
       }),
 );

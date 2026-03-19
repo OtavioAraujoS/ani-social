@@ -37,7 +37,7 @@ export const CreateAnimeSchema = t.Object({
 
 export const UpdateAnimeSchema = t.Object({
   animeId: t.String(),
-  title: t.Optional(t.String()),
+  title: t.String(),
   description: t.Optional(t.String()),
   episodes: t.Optional(t.Number()),
   review: t.Optional(t.String()),

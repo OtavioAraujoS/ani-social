@@ -2,12 +2,14 @@ import {
   AnimeListResponseInterface,
   AnimeResponseInterface,
   CreateAnimeInterface,
+  UpdateAnimeImageInterface,
   UpdateAnimeInterface,
 } from "../../interfaces/Anime";
 import { db } from "../../db";
 import { animes } from "../../db/schema";
 import { eq } from "drizzle-orm";
 import { SuccessResponseInterface } from "../../interfaces/Success";
+import cloudinary from "../../lib/cloudinary";
 
 export const AnimeService = {
   duplicatedAnime: async (title: string): Promise<boolean> => {
@@ -94,6 +96,46 @@ export const AnimeService = {
       throw new Error("Não foi possível atualizar o anime - " + error, {
         cause: error,
       });
+    }
+  },
+
+  updateAnimeImage: async (
+    anime: UpdateAnimeImageInterface,
+  ): Promise<SuccessResponseInterface> => {
+    try {
+      const duplicated = await AnimeService.duplicatedAnime(anime.title);
+
+      if (duplicated) {
+        const uploadResult = await cloudinary.uploader.upload(anime.imageUrl, {
+          folder: "animes",
+          transformation: [
+            { width: 300, height: 300, crop: "fill", gravity: "face" },
+          ],
+        });
+        const avatarUrl = uploadResult.secure_url;
+
+        await db
+          .update(animes)
+          .set({
+            updatedByUserId: anime.updatedByUserId,
+            imageUrl: avatarUrl,
+            updatedAt: new Date(),
+          })
+          .where(eq(animes.id, anime.animeId));
+        return {
+          message: "Imagem do anime atualizada com sucesso!",
+          success: true,
+          code: 200,
+        };
+      }
+      throw new Error("Anime não encontrado");
+    } catch (error) {
+      throw new Error(
+        "Não foi possível atualizar a imagem do anime - " + error,
+        {
+          cause: error,
+        },
+      );
     }
   },
 };

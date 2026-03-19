@@ -50,6 +50,7 @@ export const UpdateAnimeSchema = t.Object({
 
 export const UpdateAnimeImageSchema = t.Object({
   animeId: t.String(),
+  title: t.String(),
   imageUrl: t.String(),
   updatedByUserId: t.String(),
 });

@@ -5,6 +5,7 @@ import {
   AnimeListResponseSchema,
   AnimeSchema,
   CreateAnimeSchema,
+  UpdateAnimeImageSchema,
   UpdateAnimeSchema,
 } from "../../interfaces/Anime";
 import { SuccessResponseSchema } from "../../interfaces/Success";
@@ -29,6 +30,10 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
       })
       .patch("/", ({ body }) => AnimeService.update(body), {
         body: UpdateAnimeSchema,
+        response: SuccessResponseSchema,
+      })
+      .patch("/image", ({ body }) => AnimeService.updateAnimeImage(body), {
+        body: UpdateAnimeImageSchema,
         response: SuccessResponseSchema,
       }),
 );

@@ -7,6 +7,8 @@ import {
   UpdateUserAvatarInterface,
   UpdateUserInterface,
   UpdateUserPasswordInterface,
+  UserResponseInterface,
+  UsersListResponseInterface,
 } from "../../interfaces/User";
 import { AuthService } from "../auth/auth.service";
 import cloudinary from "../../lib/cloudinary";
@@ -38,7 +40,7 @@ export const UserService = {
     }
   },
 
-  findAll: async () => {
+  findAll: async (): Promise<UsersListResponseInterface> => {
     try {
       return await db
         .select({
@@ -57,12 +59,12 @@ export const UserService = {
     }
   },
 
-  findById: async (userId: string) => {
+  findById: async (userId: string): Promise<UserResponseInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 
       if (userExist) {
-        return await db
+        const [user] = await db
           .select({
             id: users.id,
             name: users.name,
@@ -73,6 +75,8 @@ export const UserService = {
           })
           .from(users)
           .where(eq(users.id, userId));
+
+        return user;
       }
       throw new Error("Usuário não encontrado ou não autorizado.", {
         cause: "Usuário não encontrado ou não autorizado.",
@@ -84,17 +88,21 @@ export const UserService = {
     }
   },
 
-  create: async (data: CreateUserInterface) => {
+  create: async (data: CreateUserInterface): Promise<SuccessInterface> => {
     try {
       const hashedPassword = await AuthService.hashPassword(data.password);
-      const [newUser] = await db
+      await db
         .insert(users)
         .values({
           ...data,
           password: hashedPassword,
         })
         .returning();
-      return newUser;
+      return {
+        message: "Usuário criado com sucesso!",
+        success: true,
+        code: 201,
+      };
     } catch (error) {
       throw new Error("Não foi possível criar o usuário - " + error, {
         cause: error,
@@ -102,9 +110,7 @@ export const UserService = {
     }
   },
 
-  update: async (
-    data: UpdateUserInterface,
-  ): Promise<SuccessInterface | void> => {
+  update: async (data: UpdateUserInterface): Promise<SuccessInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(data.userId);
 
@@ -140,7 +146,7 @@ export const UserService = {
     userId,
     userLoggedId,
     password,
-  }: UpdateUserPasswordInterface): Promise<SuccessInterface | void> => {
+  }: UpdateUserPasswordInterface): Promise<SuccessInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 
@@ -182,7 +188,7 @@ export const UserService = {
     userId,
     userLoggedId,
     imageBase64Path,
-  }: UpdateUserAvatarInterface) => {
+  }: UpdateUserAvatarInterface): Promise<SuccessInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 
@@ -207,9 +213,12 @@ export const UserService = {
           .update(users)
           .set({ avatarUrl, updatedAt: new Date() })
           .where(eq(users.id, userId));
-        return { message: "Avatar atualizado com sucesso!", avatarUrl };
+        return {
+          message: "Avatar atualizado com sucesso!",
+          code: 200,
+          success: true,
+        };
       }
-
       throw new Error("Usuário não encontrado ou não autorizado.", {
         cause: "Usuário não encontrado ou não autorizado.",
       });
@@ -223,7 +232,7 @@ export const UserService = {
   delete: async ({
     userId,
     userLoggedId,
-  }: DeleteUserInterface): Promise<SuccessInterface | void> => {
+  }: DeleteUserInterface): Promise<SuccessInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 

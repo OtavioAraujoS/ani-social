@@ -3,16 +3,22 @@ import { UserService } from "./users.service";
 import {
   CreateUserSchema,
   DeleteUserSchema,
+  SuccessResponseSchema,
   UpdateUserAvatarSchema,
   UpdateUserPasswordSchema,
   UpdateUserSchema,
+  UserResponseSchema,
+  UserListResponseSchema,
 } from "../../interfaces/User";
 import { adminMiddleware, authPlugin } from "../auth/auth.middleware";
 
 export const userController = new Elysia({ prefix: "/users" })
-  .get("/:userId", ({ params }) => UserService.findById(params.userId))
+  .get("/:userId", ({ params }) => UserService.findById(params.userId), {
+    response: UserResponseSchema,
+  })
   .post("/", ({ body }) => UserService.create(body), {
     body: CreateUserSchema,
+    response: SuccessResponseSchema,
   })
 
   .group("/me", (app) =>
@@ -20,19 +26,25 @@ export const userController = new Elysia({ prefix: "/users" })
       .use(authPlugin)
       .patch("/", ({ body }) => UserService.update(body), {
         body: UpdateUserSchema,
+        response: SuccessResponseSchema,
       })
       .patch("/password", ({ body }) => UserService.updatePassword(body), {
         body: UpdateUserPasswordSchema,
+        response: SuccessResponseSchema,
       })
       .patch("/avatar", ({ body }) => UserService.updateUserAvatar(body), {
         body: UpdateUserAvatarSchema,
+        response: SuccessResponseSchema,
       }),
   )
   .group("/admin", (app) =>
     app
       .use(adminMiddleware)
-      .get("/", () => UserService.findAll())
+      .get("/", () => UserService.findAll(), {
+        response: UserListResponseSchema,
+      })
       .delete("/", ({ body }) => UserService.delete(body), {
         body: DeleteUserSchema,
+        response: SuccessResponseSchema,
       }),
   );

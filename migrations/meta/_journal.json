@@ -15,6 +15,13 @@
       "when": 1773838066446,
       "tag": "0001_strange_angel",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773930710528,
+      "tag": "0002_abandoned_sharon_ventura",
+      "breakpoints": true
     }
   ]
 }

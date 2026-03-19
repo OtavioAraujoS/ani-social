@@ -40,7 +40,16 @@ export const UserService = {
 
   findAll: async () => {
     try {
-      return await db.select().from(users);
+      return await db
+        .select({
+          id: users.id,
+          name: users.name,
+          userName: users.userName,
+          avatarUrl: users.avatarUrl,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        })
+        .from(users);
     } catch (error) {
       throw new Error("Não foi possível listar os usuários - " + error, {
         cause: error,

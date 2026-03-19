@@ -10,7 +10,6 @@ import {
 import { adminMiddleware, authPlugin } from "../auth/auth.middleware";
 
 export const userController = new Elysia({ prefix: "/users" })
-  .get("/", () => UserService.findAll())
   .post("/", ({ body }) => UserService.create(body), {
     body: CreateUserSchema,
   })
@@ -31,6 +30,7 @@ export const userController = new Elysia({ prefix: "/users" })
   .group("/admin", (app) =>
     app
       .use(adminMiddleware)
+      .get("/", () => UserService.findAll())
       .delete("/", ({ body }) => UserService.delete(body), {
         body: DeleteUserSchema,
       }),

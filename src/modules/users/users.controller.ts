@@ -3,7 +3,6 @@ import { UserService } from "./users.service";
 import {
   CreateUserSchema,
   DeleteUserSchema,
-  SuccessResponseSchema,
   UpdateUserAvatarSchema,
   UpdateUserPasswordSchema,
   UpdateUserSchema,
@@ -11,6 +10,7 @@ import {
   UserListResponseSchema,
 } from "../../interfaces/User";
 import { adminMiddleware, authPlugin } from "../auth/auth.middleware";
+import { SuccessResponseSchema } from "../../interfaces/Success";
 
 export const userController = new Elysia({ prefix: "/users" })
   .post("/", ({ body }) => UserService.create(body), {

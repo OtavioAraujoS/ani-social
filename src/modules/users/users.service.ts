@@ -12,7 +12,7 @@ import {
 } from "../../interfaces/User";
 import { AuthService } from "../auth/auth.service";
 import cloudinary from "../../lib/cloudinary";
-import { SuccessInterface } from "../../interfaces/Success";
+import { SuccessResponseInterface } from "../../interfaces/Success";
 
 export const UserService = {
   verifyUserExist: async (userId: string): Promise<boolean> => {
@@ -88,7 +88,9 @@ export const UserService = {
     }
   },
 
-  create: async (data: CreateUserInterface): Promise<SuccessInterface> => {
+  create: async (
+    data: CreateUserInterface,
+  ): Promise<SuccessResponseInterface> => {
     try {
       const hashedPassword = await AuthService.hashPassword(data.password);
       await db
@@ -110,7 +112,9 @@ export const UserService = {
     }
   },
 
-  update: async (data: UpdateUserInterface): Promise<SuccessInterface> => {
+  update: async (
+    data: UpdateUserInterface,
+  ): Promise<SuccessResponseInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(data.userId);
 
@@ -146,7 +150,7 @@ export const UserService = {
     userId,
     userLoggedId,
     password,
-  }: UpdateUserPasswordInterface): Promise<SuccessInterface> => {
+  }: UpdateUserPasswordInterface): Promise<SuccessResponseInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 
@@ -188,7 +192,7 @@ export const UserService = {
     userId,
     userLoggedId,
     imageBase64Path,
-  }: UpdateUserAvatarInterface): Promise<SuccessInterface> => {
+  }: UpdateUserAvatarInterface): Promise<SuccessResponseInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 
@@ -232,7 +236,7 @@ export const UserService = {
   delete: async ({
     userId,
     userLoggedId,
-  }: DeleteUserInterface): Promise<SuccessInterface> => {
+  }: DeleteUserInterface): Promise<SuccessResponseInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 

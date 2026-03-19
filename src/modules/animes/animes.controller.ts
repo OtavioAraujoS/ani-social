@@ -1,4 +1,4 @@
-import Elysia from "elysia";
+import { Elysia, t } from "elysia";
 import { authPlugin } from "../auth/auth.middleware";
 import { AnimeService } from "./animes.service";
 import { AnimeListResponseSchema, AnimeSchema } from "../../interfaces/Anime";
@@ -12,6 +12,9 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
         response: AnimeListResponseSchema,
       })
       .get("/:animeId", ({ params }) => AnimeService.findById(params.animeId), {
+        params: t.Object({
+          animeId: t.String({ format: "uuid" }),
+        }),
         response: AnimeSchema,
       }),
 );

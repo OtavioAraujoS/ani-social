@@ -10,6 +10,7 @@ import {
 import { adminMiddleware, authPlugin } from "../auth/auth.middleware";
 
 export const userController = new Elysia({ prefix: "/users" })
+  .get("/:userId", ({ params }) => UserService.findById(params.userId))
   .post("/", ({ body }) => UserService.create(body), {
     body: CreateUserSchema,
   })

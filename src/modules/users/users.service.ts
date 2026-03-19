@@ -57,6 +57,33 @@ export const UserService = {
     }
   },
 
+  findById: async (userId: string) => {
+    try {
+      const userExist = await UserService.verifyUserExist(userId);
+
+      if (userExist) {
+        return await db
+          .select({
+            id: users.id,
+            name: users.name,
+            userName: users.userName,
+            avatarUrl: users.avatarUrl,
+            createdAt: users.createdAt,
+            updatedAt: users.updatedAt,
+          })
+          .from(users)
+          .where(eq(users.id, userId));
+      }
+      throw new Error("Usuário não encontrado ou não autorizado.", {
+        cause: "Usuário não encontrado ou não autorizado.",
+      });
+    } catch (error) {
+      throw new Error("Não foi possível encontrar o usuário - " + error, {
+        cause: error,
+      });
+    }
+  },
+
   create: async (data: CreateUserInterface) => {
     try {
       const hashedPassword = await AuthService.hashPassword(data.password);

@@ -35,7 +35,7 @@ export const animes = pgTable("animes", {
   stars: integer("stars"),
   imageUrl: text("image_url"),
   createdByUserId: uuid("created_by_user_id").notNull(),
-  updatedByUserId: uuid("updated_by_user_id").notNull(),
+  updatedByUserId: uuid("updated_by_user_id"),
   status: animeStatusEnum("status").notNull().default(AnimeStatusEnum.PENDING),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

@@ -1,7 +1,12 @@
 import { Elysia, t } from "elysia";
 import { authPlugin } from "../auth/auth.middleware";
 import { AnimeService } from "./animes.service";
-import { AnimeListResponseSchema, AnimeSchema } from "../../interfaces/Anime";
+import {
+  AnimeListResponseSchema,
+  AnimeSchema,
+  CreateAnimeSchema,
+} from "../../interfaces/Anime";
+import { SuccessResponseSchema } from "../../interfaces/Success";
 
 export const AnimeController = new Elysia({ prefix: "/animes" }).group(
   "",
@@ -16,5 +21,9 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
           animeId: t.String({ format: "uuid" }),
         }),
         response: AnimeSchema,
+      })
+      .post("/", ({ body }) => AnimeService.create(body), {
+        body: CreateAnimeSchema,
+        response: SuccessResponseSchema,
       }),
 );

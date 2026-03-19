@@ -13,17 +13,17 @@ import {
 import { adminMiddleware, authPlugin } from "../auth/auth.middleware";
 
 export const userController = new Elysia({ prefix: "/users" })
-  .get("/:userId", ({ params }) => UserService.findById(params.userId), {
-    response: UserResponseSchema,
-  })
   .post("/", ({ body }) => UserService.create(body), {
     body: CreateUserSchema,
     response: SuccessResponseSchema,
   })
 
-  .group("/me", (app) =>
+  .group("", (app) =>
     app
       .use(authPlugin)
+      .get("/:userId", ({ params }) => UserService.findById(params.userId), {
+        response: UserResponseSchema,
+      })
       .patch("/", ({ body }) => UserService.update(body), {
         body: UpdateUserSchema,
         response: SuccessResponseSchema,

@@ -10,27 +10,31 @@ export const authPlugin = (app: Elysia) =>
         exp: "1h",
       }),
     )
-    .derive(async ({ jwt, headers, set }) => {
+    .derive(async ({ jwt, headers }) => {
       const authHeader = headers["authorization"];
       const token = authHeader?.startsWith("Bearer ")
         ? authHeader.slice(7)
         : null;
 
       if (!token) {
-        set.status = 401;
-        throw new Error("Token não fornecido");
+        return { user: null };
       }
 
       const payload = await jwt.verify(token);
 
       if (!payload) {
-        set.status = 401;
-        throw new Error("Token inválido ou expirado");
+        return { user: null };
       }
 
       return {
         user: payload as Record<string, any>,
       };
+    })
+    .onBeforeHandle(({ user, set }) => {
+      if (!user) {
+        set.status = 401;
+        return { success: false, message: "Token inválido, expirado ou não fornecido." };
+      }
     });
 
 export const protectedRoutes = new Elysia()
@@ -38,19 +42,18 @@ export const protectedRoutes = new Elysia()
   .get("/profile", ({ user }) => {
     return {
       message: "Perfil acessado!",
-      userId: user.sub,
-      role: user.role,
-      userName: user.userName,
+      userId: user!.sub,
+      role: user!.role,
+      userName: user!.userName,
     };
   });
 
-export const adminMiddleware = new Elysia()
-  .use(authPlugin)
-  .onBeforeHandle(({ user, set }) => {
-    if (user.role !== "ADMIN") {
-      set.status = 403;
-      throw new Error(
-        "Acesso negado. Apenas administradores podem realizar esta ação.",
-      );
-    }
-  });
+export const adminMiddleware = (app: Elysia) =>
+  app
+    .use(authPlugin)
+    .onBeforeHandle(({ user, set }) => {
+      if (!user || user.role !== "ADMIN") {
+        set.status = 403;
+        return { success: false, message: "Acesso negado. Apenas administradores podem realizar esta ação." };
+      }
+    });

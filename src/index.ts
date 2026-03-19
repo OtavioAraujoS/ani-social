@@ -1,10 +1,13 @@
 import { Elysia } from "elysia";
+import { swagger } from "@elysiajs/swagger";
 import { userController } from "./modules/users/users.controller";
 import { authController } from "./modules/auth/auth.controller";
 
 const app = new Elysia()
-  .get("/", () => "Bem-vindo à minha API do Ani-Social!")
-
+  .use(swagger({ path: "/docs" }))
+  .get("/", ({ redirect }) => {
+    return redirect("/docs");
+  })
   .group("/api", (app) => app.use(userController).use(authController))
 
   .listen(3333);

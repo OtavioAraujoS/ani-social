@@ -12,7 +12,7 @@ import {
 import { adminMiddleware, authPlugin } from "../auth/auth.middleware";
 import { SuccessResponseSchema } from "../../interfaces/Success";
 
-export const userController = new Elysia({ prefix: "/users" })
+export const UserController = new Elysia({ prefix: "/users" })
   .post("/", ({ body }) => UserService.create(body), {
     body: CreateUserSchema,
     response: SuccessResponseSchema,

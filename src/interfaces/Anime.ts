@@ -11,14 +11,14 @@ export const AnimeSchema = t.Object({
   title: t.String(),
   description: t.String(),
   episodes: t.Number(),
-  review: t.String(),
-  stars: t.Number(),
-  imageUrl: t.String(),
+  review: t.Nullable(t.String()),
+  stars: t.Nullable(t.Number()),
+  imageUrl: t.Nullable(t.String()),
   createdByUserId: t.String(),
   updatedByUserId: t.String(),
   status: t.Enum(AnimeStatusEnum),
-  createdAt: t.String(),
-  updatedAt: t.String(),
+  createdAt: t.Date(),
+  updatedAt: t.Date(),
 });
 
 export const AnimeListResponseSchema = t.Array(AnimeSchema);

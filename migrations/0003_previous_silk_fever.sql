@@ -1,0 +1,1 @@
+ALTER TABLE "animes" ALTER COLUMN "updated_by_user_id" DROP NOT NULL;

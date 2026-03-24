@@ -7,4 +7,14 @@ cloudinary.config({
   secure: true,
 });
 
+export const uploadImage = async (
+  imageBase64Path: string,
+  folder: string
+): Promise<string> => {
+  const uploadResult = await cloudinary.uploader.upload(imageBase64Path, {
+    folder,
+  });
+  return uploadResult.secure_url;
+};
+
 export default cloudinary;

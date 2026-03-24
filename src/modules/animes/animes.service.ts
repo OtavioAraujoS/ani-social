@@ -9,7 +9,7 @@ import { db } from "../../db";
 import { animes } from "../../db/schema";
 import { eq } from "drizzle-orm";
 import { SuccessResponseInterface } from "../../interfaces/Success";
-import cloudinary from "../../lib/cloudinary";
+import { uploadImage } from "../../lib/cloudinary";
 
 export const AnimeService = {
   duplicatedAnime: async (title: string): Promise<boolean> => {
@@ -106,13 +106,7 @@ export const AnimeService = {
       const duplicated = await AnimeService.duplicatedAnime(anime.title);
 
       if (duplicated) {
-        const uploadResult = await cloudinary.uploader.upload(anime.imageUrl, {
-          folder: "animes",
-          transformation: [
-            { width: 300, height: 300, crop: "fill", gravity: "face" },
-          ],
-        });
-        const avatarUrl = uploadResult.secure_url;
+        const avatarUrl = await uploadImage(anime.imageUrl, "animes");
 
         await db
           .update(animes)

@@ -11,7 +11,7 @@ import {
   UsersListResponseInterface,
 } from "../../interfaces/User";
 import { AuthService } from "../auth/auth.service";
-import cloudinary from "../../lib/cloudinary";
+import { uploadImage } from "../../lib/cloudinary";
 import { SuccessResponseInterface } from "../../interfaces/Success";
 
 export const UserService = {
@@ -206,13 +206,7 @@ export const UserService = {
           throw new Error("Usuário não autorizado.");
         }
 
-        const uploadResult = await cloudinary.uploader.upload(imageBase64Path, {
-          folder: "avatars",
-          transformation: [
-            { width: 300, height: 300, crop: "fill", gravity: "face" },
-          ],
-        });
-        const avatarUrl = uploadResult.secure_url;
+        const avatarUrl = await uploadImage(imageBase64Path, "avatars");
         await db
           .update(users)
           .set({ avatarUrl, updatedAt: new Date() })

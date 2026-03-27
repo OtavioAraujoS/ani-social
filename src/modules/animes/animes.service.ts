@@ -10,6 +10,8 @@ import { animes, users } from "../../db/schema";
 import { eq, aliasedTable } from "drizzle-orm";
 import { SuccessResponseInterface } from "../../interfaces/Success";
 import { uploadImage } from "../../lib/cloudinary";
+import { UserService } from "../users/users.service";
+import { AuthService } from "../auth/auth.service";
 
 export const AnimeService = {
   verifyAnimeExistence: async (animeId: string): Promise<boolean> => {
@@ -174,11 +176,22 @@ export const AnimeService = {
     }
   },
 
-  deleteAnime: async (animeId: string): Promise<SuccessResponseInterface> => {
+  deleteAnime: async (
+    animeId: string,
+    userLoggedId: string,
+  ): Promise<SuccessResponseInterface> => {
     try {
-      const animeExist = await AnimeService.verifyAnimeExistence(animeId);
+      const [anime] = await db
+        .select()
+        .from(animes)
+        .where(eq(animes.id, animeId));
 
-      if (animeExist) {
+      if (anime) {
+        const isAuthorized = await AuthService.userIsTheSameOrAdmin(
+          anime.createdByUserId,
+          userLoggedId,
+        );
+        if (!isAuthorized) throw new Error("Usuário não autorizado");
         await db.delete(animes).where(eq(animes.id, animeId));
         return {
           message: "Anime deletado com sucesso!",

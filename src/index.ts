@@ -3,6 +3,7 @@ import { swagger } from "@elysiajs/swagger";
 import { UserController } from "./modules/users/users.controller";
 import { authController } from "./modules/auth/auth.controller";
 import { AnimeController } from "./modules/animes/animes.controller";
+import { TopicController } from "./modules/topics/topics.controller";
 
 const app = new Elysia()
   .use(swagger({ path: "/docs" }))
@@ -10,9 +11,12 @@ const app = new Elysia()
     return redirect("/docs");
   })
   .group("/api", (app) =>
-    app.use(authController).use(UserController).use(AnimeController),
+    app
+      .use(authController)
+      .use(UserController)
+      .use(AnimeController)
+      .use(TopicController),
   )
-
   .listen(3333);
 
 console.log(

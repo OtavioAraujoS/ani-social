@@ -38,7 +38,8 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
       })
       .delete(
         "/:animeId",
-        ({ params }) => AnimeService.deleteAnime(params.animeId),
+        ({ params, user }) =>
+          AnimeService.deleteAnime(params.animeId, user!.sub),
         {
           params: t.Object({
             animeId: t.String({ format: "uuid" }),

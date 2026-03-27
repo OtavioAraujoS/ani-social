@@ -4,6 +4,7 @@ import { UserController } from "./modules/users/users.controller";
 import { authController } from "./modules/auth/auth.controller";
 import { AnimeController } from "./modules/animes/animes.controller";
 import { TopicController } from "./modules/topics/topics.controller";
+import { CommentsController } from "./modules/comments/comments.controller";
 
 const app = new Elysia()
   .use(swagger({ path: "/docs" }))
@@ -15,7 +16,8 @@ const app = new Elysia()
       .use(authController)
       .use(UserController)
       .use(AnimeController)
-      .use(TopicController),
+      .use(TopicController)
+      .use(CommentsController),
   )
   .listen(3333);
 

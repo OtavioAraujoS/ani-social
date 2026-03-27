@@ -52,3 +52,12 @@ export const topics = pgTable("topics", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   comments: integer("comments").default(0).notNull(),
 });
+
+export const comments = pgTable("comments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  content: text("content").notNull(),
+  topicId: uuid("topic_id").notNull(),
+  createdByUserId: uuid("created_by_user_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});

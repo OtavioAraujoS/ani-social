@@ -1,5 +1,5 @@
 import { eq, aliasedTable } from "drizzle-orm";
-import { topics, animes, users } from "../../db/schema";
+import { topics, animes, users, comments } from "../../db/schema";
 import { db } from "../../db";
 import {
   CreateTopicInterface,
@@ -97,20 +97,54 @@ export const TopicsService = {
         throw new Error("Tópico não encontrado.");
       }
 
-      const result = await db.query.topics.findFirst({
-        where: eq(topics.id, topicId),
-        with: {
-          animeInfos: true,
-          createdByUserId: true,
-          updatedByUserId: true,
-        },
-      });
+      const updatedByUsers = aliasedTable(users, "updatedByUsers");
 
-      if (!result) {
+      const result = await db
+        .select({
+          topic: topics,
+          animeInfos: {
+            id: animes.id,
+            title: animes.title,
+            imageUrl: animes.imageUrl,
+          },
+          createdByUserId: {
+            userId: users.id,
+            userName: users.userName,
+            avatarUrl: users.avatarUrl,
+          },
+          updatedByUserId: {
+            userId: updatedByUsers.id,
+            userName: updatedByUsers.userName,
+            avatarUrl: updatedByUsers.avatarUrl,
+          },
+        })
+        .from(topics)
+        .leftJoin(animes, eq(topics.animeId, animes.id))
+        .leftJoin(users, eq(topics.createdByUserId, users.id))
+        .leftJoin(
+          updatedByUsers,
+          eq(topics.updatedByUserId, updatedByUsers.id),
+        )
+        .where(eq(topics.id, topicId));
+
+      if (!result || result.length === 0) {
         throw new Error("Tópico não encontrado.");
       }
 
-      return result;
+      const row = result[0];
+      const updatedByUser = row.updatedByUserId?.userId
+        ? row.updatedByUserId
+        : null;
+
+      const { animeId, createdByUserId, updatedByUserId, ...restTopic } =
+        row.topic;
+
+      return {
+        ...restTopic,
+        animeInfos: row.animeInfos!,
+        createdByUserId: row.createdByUserId!,
+        updatedByUserId: updatedByUser,
+      };
     } catch (error) {
       throw new Error("Não foi possível encontrar o tópico - " + error, {
         cause: error,

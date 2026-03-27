@@ -35,5 +35,15 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
       .patch("/image", ({ body }) => AnimeService.updateAnimeImage(body), {
         body: UpdateAnimeImageSchema,
         response: SuccessResponseSchema,
-      }),
+      })
+      .delete(
+        "/:animeId",
+        ({ params }) => AnimeService.deleteAnime(params.animeId),
+        {
+          params: t.Object({
+            animeId: t.String({ format: "uuid" }),
+          }),
+          response: SuccessResponseSchema,
+        },
+      ),
 );

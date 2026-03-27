@@ -131,11 +131,13 @@ export const UserService = {
     userLoggedId: string;
   }): Promise<SuccessResponseInterface> => {
     try {
-      const userExist = await UserService.verifyUserExist(userId);
+      // Se userId for "self", usamos o ID do token. Isso previne erros de ID e facilita o teste.
+      const targetId = userId === "self" ? userLoggedId : userId;
+      const userExist = await UserService.verifyUserExist(targetId);
 
       if (userExist) {
         const userIsTheSameOrAdmin = await AuthService.userIsTheSameOrAdmin(
-          userId,
+          targetId,
           userLoggedId,
         );
 
@@ -153,7 +155,7 @@ export const UserService = {
             userName: sanitizedUserName,
             updatedAt: new Date(),
           })
-          .where(eq(users.id, userId));
+          .where(eq(users.id, targetId));
         return {
           message: "Usuário atualizado com sucesso!",
           success: true,
@@ -179,11 +181,12 @@ export const UserService = {
     userLoggedId: string;
   }): Promise<SuccessResponseInterface> => {
     try {
-      const userExist = await UserService.verifyUserExist(userId);
+      const targetId = userId === "self" ? userLoggedId : userId;
+      const userExist = await UserService.verifyUserExist(targetId);
 
       if (userExist) {
         const userIsTheSameOrAdmin = await AuthService.userIsTheSameOrAdmin(
-          userId,
+          targetId,
           userLoggedId,
         );
 
@@ -195,7 +198,7 @@ export const UserService = {
         await db
           .update(users)
           .set({ password: hashedPassword })
-          .where(eq(users.id, userId));
+          .where(eq(users.id, targetId));
         return {
           message: "Senha atualizada com sucesso!",
           success: true,
@@ -206,7 +209,6 @@ export const UserService = {
         cause: "Usuário não encontrado ou não autorizado.",
       });
     } catch (error) {
-      console.error("DIAGNOSTICO PASSWORD:", { error, userId, userLoggedId });
       throw new Error(
         "Não foi possível atualizar a senha do usuário- " + error,
         {
@@ -224,11 +226,12 @@ export const UserService = {
     userLoggedId: string;
   }): Promise<SuccessResponseInterface> => {
     try {
-      const userExist = await UserService.verifyUserExist(userId);
+      const targetId = userId === "self" ? userLoggedId : userId;
+      const userExist = await UserService.verifyUserExist(targetId);
 
       if (userExist) {
         const userIsTheSameOrAdmin = await AuthService.userIsTheSameOrAdmin(
-          userId,
+          targetId,
           userLoggedId,
         );
 
@@ -240,7 +243,7 @@ export const UserService = {
         await db
           .update(users)
           .set({ avatarUrl, updatedAt: new Date() })
-          .where(eq(users.id, userId));
+          .where(eq(users.id, targetId));
         return {
           message: "Avatar atualizado com sucesso!",
           code: 200,
@@ -251,7 +254,6 @@ export const UserService = {
         cause: "Usuário não encontrado ou não autorizado.",
       });
     } catch (error) {
-      console.error("DIAGNOSTICO AVATAR:", { error, userId, userLoggedId });
       throw new Error("Não foi possível atualizar o avatar- " + error, {
         cause: error,
       });
@@ -265,11 +267,12 @@ export const UserService = {
     userLoggedId: string;
   }): Promise<SuccessResponseInterface> => {
     try {
-      const userExist = await UserService.verifyUserExist(userId);
+      const targetId = userId === "self" ? userLoggedId : userId;
+      const userExist = await UserService.verifyUserExist(targetId);
 
       if (userExist) {
         const userIsTheSameOrAdmin = await AuthService.userIsTheSameOrAdmin(
-          userId,
+          targetId,
           userLoggedId,
         );
 
@@ -277,7 +280,7 @@ export const UserService = {
           throw new Error("Usuário não autorizado.");
         }
 
-        await db.delete(users).where(eq(users.id, userId));
+        await db.delete(users).where(eq(users.id, targetId));
         return {
           message: "Usuário deletado com sucesso!",
           success: true,

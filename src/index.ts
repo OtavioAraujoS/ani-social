@@ -21,7 +21,11 @@ const app = new Elysia()
   })
   .group("/api", (app) =>
     app
-      .use(rateLimit({ duration: 60000, max: 100 }))
+      .use(rateLimit({ 
+        duration: 60000, 
+        max: 100,
+        generator: (req) => req.headers.get("x-forwarded-for") || "localhost" 
+      }))
       .use(authController)
       .use(UserController)
       .use(AnimeController)

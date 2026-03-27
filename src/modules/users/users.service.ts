@@ -105,8 +105,8 @@ export const UserService = {
       await db
         .insert(users)
         .values({
-          ...data,
           name: xss(data.name),
+          userName: data.userName,
           password: hashedPassword,
         })
         .returning();
@@ -116,6 +116,7 @@ export const UserService = {
         code: 201,
       };
     } catch (error) {
+      console.error("ERRO COMPLETO DB:", JSON.stringify(error, null, 2), error);
       throw new Error("Não foi possível criar o usuário - " + error, {
         cause: error,
       });

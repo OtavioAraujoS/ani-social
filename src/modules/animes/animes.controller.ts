@@ -3,7 +3,7 @@ import { authPlugin } from "../auth/auth.middleware";
 import { AnimeService } from "./animes.service";
 import {
   AnimeListResponseSchema,
-  AnimeSchema,
+  AnimeDetailResponseSchema,
   CreateAnimeSchema,
   UpdateAnimeImageSchema,
   UpdateAnimeSchema,
@@ -22,7 +22,7 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
         params: t.Object({
           animeId: t.String({ format: "uuid" }),
         }),
-        response: AnimeSchema,
+        response: AnimeDetailResponseSchema,
       })
       .post("/", ({ body }) => AnimeService.create(body), {
         body: CreateAnimeSchema,

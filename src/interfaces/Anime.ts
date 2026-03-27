@@ -1,4 +1,5 @@
 import { t } from "elysia";
+import { UserInfoSchema } from "./User";
 
 export enum AnimeStatusEnum {
   COMPLETED = "COMPLETED",
@@ -14,8 +15,6 @@ export const AnimeSchema = t.Object({
   review: t.Nullable(t.String()),
   stars: t.Nullable(t.Number()),
   imageUrl: t.Nullable(t.String()),
-  createdByUserId: t.String(),
-  updatedByUserId: t.Nullable(t.String()),
   status: t.Enum(AnimeStatusEnum),
   createdAt: t.Date(),
   updatedAt: t.Date(),
@@ -59,7 +58,16 @@ export const DeleteAnimeSchema = t.Object({
   userLoggedId: t.String(),
 });
 
-export type AnimeResponseInterface = typeof AnimeSchema.static;
+export const AnimeDetailResponseSchema = t.Intersect([
+  AnimeSchema,
+  t.Object({
+    createdByUser: UserInfoSchema,
+    updatedByUser: t.Nullable(UserInfoSchema),
+  }),
+]);
+
+export type AnimeDetailResponseInterface =
+  typeof AnimeDetailResponseSchema.static;
 export type AnimeListResponseInterface = typeof AnimeListResponseSchema.static;
 export type CreateAnimeInterface = typeof CreateAnimeSchema.static;
 export type UpdateAnimeInterface = typeof UpdateAnimeSchema.static;

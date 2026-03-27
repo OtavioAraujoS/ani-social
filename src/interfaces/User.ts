@@ -41,6 +41,12 @@ export const DeleteUserSchema = t.Object({
   userLoggedId: t.String(),
 });
 
+export const UserInfoSchema = t.Object({
+  userId: t.String(),
+  userName: t.String(),
+  avatarUrl: t.Nullable(t.String()),
+});
+
 export type UserResponseInterface = typeof UserResponseSchema.static;
 export type UsersListResponseInterface = typeof UserListResponseSchema.static;
 export type CreateUserInterface = typeof CreateUserSchema.static;

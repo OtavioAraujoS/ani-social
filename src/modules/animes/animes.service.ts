@@ -1,13 +1,13 @@
 import {
   AnimeListResponseInterface,
-  AnimeResponseInterface,
+  AnimeDetailResponseInterface,
   CreateAnimeInterface,
   UpdateAnimeImageInterface,
   UpdateAnimeInterface,
 } from "../../interfaces/Anime";
 import { db } from "../../db";
-import { animes } from "../../db/schema";
-import { eq } from "drizzle-orm";
+import { animes, users } from "../../db/schema";
+import { eq, aliasedTable } from "drizzle-orm";
 import { SuccessResponseInterface } from "../../interfaces/Success";
 import { uploadImage } from "../../lib/cloudinary";
 
@@ -52,14 +52,40 @@ export const AnimeService = {
     }
   },
 
-  findById: async (animeId: string): Promise<AnimeResponseInterface> => {
+  findById: async (animeId: string): Promise<AnimeDetailResponseInterface> => {
     try {
-      const [anime] = await db
-        .select()
+      const updatedByUsers = aliasedTable(users, "updatedByUsers");
+
+      const [result] = await db
+        .select({
+          anime: animes,
+          createdByUser: {
+            userId: users.id,
+            userName: users.userName,
+            avatarUrl: users.avatarUrl,
+          },
+          updatedByUser: {
+            userId: updatedByUsers.id,
+            userName: updatedByUsers.userName,
+            avatarUrl: updatedByUsers.avatarUrl,
+          },
+        })
         .from(animes)
+        .leftJoin(users, eq(animes.createdByUserId, users.id))
+        .leftJoin(updatedByUsers, eq(animes.updatedByUserId, updatedByUsers.id))
         .where(eq(animes.id, animeId));
-      if (!anime) throw new Error("Anime não encontrado");
-      return anime;
+
+      if (!result) throw new Error("Anime não encontrado");
+
+      const updatedByUser = result.updatedByUser?.userId
+        ? result.updatedByUser
+        : null;
+
+      return {
+        ...result.anime,
+        createdByUser: result.createdByUser! as any,
+        updatedByUser: updatedByUser as any,
+      };
     } catch (error) {
       throw new Error(
         "Não foi possível verificar o anime informado - " + error,

@@ -116,7 +116,7 @@ export const UserService = {
         code: 201,
       };
     } catch (error) {
-      console.error("ERRO COMPLETO DB:", JSON.stringify(error, null, 2), error);
+      console.log("ERRO COMPLETO DB:", JSON.stringify(error, null, 2), error);
       throw new Error("Não foi possível criar o usuário - " + error, {
         cause: error,
       });

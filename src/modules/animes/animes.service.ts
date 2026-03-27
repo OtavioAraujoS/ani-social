@@ -12,6 +12,21 @@ import { SuccessResponseInterface } from "../../interfaces/Success";
 import { uploadImage } from "../../lib/cloudinary";
 
 export const AnimeService = {
+  verifyAnimeExistence: async (animeId: string): Promise<boolean> => {
+    try {
+      const [anime] = await db
+        .select()
+        .from(animes)
+        .where(eq(animes.id, animeId));
+      if (!anime) return false;
+      return true;
+    } catch (error) {
+      throw new Error("Não foi possível verificar os animes - " + error, {
+        cause: error,
+      });
+    }
+  },
+
   duplicatedAnime: async (title: string): Promise<boolean> => {
     try {
       const [existingAnime] = await db
@@ -81,9 +96,9 @@ export const AnimeService = {
     anime: UpdateAnimeInterface,
   ): Promise<SuccessResponseInterface> => {
     try {
-      const duplicated = await AnimeService.duplicatedAnime(anime.title);
+      const animeExist = await AnimeService.verifyAnimeExistence(anime.animeId);
 
-      if (duplicated) {
+      if (animeExist) {
         await db.update(animes).set(anime).where(eq(animes.id, anime.animeId));
         return {
           message: "Anime atualizado com sucesso!",
@@ -103,9 +118,9 @@ export const AnimeService = {
     anime: UpdateAnimeImageInterface,
   ): Promise<SuccessResponseInterface> => {
     try {
-      const duplicated = await AnimeService.duplicatedAnime(anime.title);
+      const animeExist = await AnimeService.verifyAnimeExistence(anime.animeId);
 
-      if (duplicated) {
+      if (animeExist) {
         const avatarUrl = await uploadImage(anime.imageUrl, "animes");
 
         await db
@@ -130,6 +145,26 @@ export const AnimeService = {
           cause: error,
         },
       );
+    }
+  },
+
+  deleteAnime: async (animeId: string): Promise<SuccessResponseInterface> => {
+    try {
+      const animeExist = await AnimeService.verifyAnimeExistence(animeId);
+
+      if (animeExist) {
+        await db.delete(animes).where(eq(animes.id, animeId));
+        return {
+          message: "Anime deletado com sucesso!",
+          success: true,
+          code: 200,
+        };
+      }
+      throw new Error("Anime não encontrado");
+    } catch (error) {
+      throw new Error("Não foi possível deletar o anime - " + error, {
+        cause: error,
+      });
     }
   },
 };

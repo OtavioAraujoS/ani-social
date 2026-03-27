@@ -14,31 +14,26 @@ export const CreateUserSchema = t.Object({
   name: t.String(),
   userName: t.String(),
   password: t.String(),
-  role: t.Optional(t.Union([t.Literal("USER"), t.Literal("ADMIN")])),
 });
 
 export const UpdateUserSchema = t.Object({
   userId: t.String(),
   name: t.String(),
   userName: t.String(),
-  userLoggedId: t.String(),
 });
 
 export const UpdateUserPasswordSchema = t.Object({
   userId: t.String(),
-  userLoggedId: t.String(),
   password: t.String(),
 });
 
 export const UpdateUserAvatarSchema = t.Object({
   userId: t.String(),
-  userLoggedId: t.String(),
   imageBase64Path: t.String(),
 });
 
 export const DeleteUserSchema = t.Object({
   userId: t.String(),
-  userLoggedId: t.String(),
 });
 
 export const UserInfoSchema = t.Object({

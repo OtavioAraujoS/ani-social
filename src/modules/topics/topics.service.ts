@@ -6,6 +6,7 @@ import {
   ListTopicsResponseInterface,
   TopicResponseInterface,
   UpdateTopicInterface,
+  DeleteTopicInterface,
 } from "../../interfaces/Topic";
 import { SuccessResponseInterface } from "../../interfaces/Success";
 import { AuthService } from "../auth/auth.service";
@@ -121,10 +122,7 @@ export const TopicsService = {
         .from(topics)
         .leftJoin(animes, eq(topics.animeId, animes.id))
         .leftJoin(users, eq(topics.createdByUserId, users.id))
-        .leftJoin(
-          updatedByUsers,
-          eq(topics.updatedByUserId, updatedByUsers.id),
-        )
+        .leftJoin(updatedByUsers, eq(topics.updatedByUserId, updatedByUsers.id))
         .where(eq(topics.id, topicId));
 
       if (!result || result.length === 0) {
@@ -152,15 +150,20 @@ export const TopicsService = {
     }
   },
 
-  createTopic: async (
-    data: CreateTopicInterface,
-  ): Promise<SuccessResponseInterface> => {
+  createTopic: async ({
+    title,
+    description,
+    animeId,
+    userLoggedId,
+  }: CreateTopicInterface & {
+    userLoggedId: string;
+  }): Promise<SuccessResponseInterface> => {
     try {
       await db.insert(topics).values({
-        title: data.title,
-        description: data.description,
-        animeId: data.animeId,
-        createdByUserId: data.userLoggedId,
+        title,
+        description,
+        animeId,
+        createdByUserId: userLoggedId,
       });
       return {
         message: "Tópico criado com sucesso!",
@@ -174,19 +177,24 @@ export const TopicsService = {
     }
   },
 
-  updateTopic: async (
-    data: UpdateTopicInterface,
-  ): Promise<SuccessResponseInterface> => {
+  updateTopic: async ({
+    topicId,
+    title,
+    description,
+    userLoggedId,
+  }: UpdateTopicInterface & {
+    userLoggedId: string;
+  }): Promise<SuccessResponseInterface> => {
     try {
-      const topicExist = await TopicsService.verifyTopicExist(data.topicId);
+      const topicExist = await TopicsService.verifyTopicExist(topicId);
 
       if (!topicExist) {
         throw new Error("Tópico não encontrado.");
       }
 
       const userPermission = await TopicsService.verifyUserPermission(
-        data.topicId,
-        data.userLoggedId,
+        topicId,
+        userLoggedId,
       );
 
       if (!userPermission) {
@@ -196,11 +204,11 @@ export const TopicsService = {
       await db
         .update(topics)
         .set({
-          title: data.title,
-          description: data.description,
+          title,
+          description,
           updatedAt: new Date(),
         })
-        .where(eq(topics.id, data.topicId));
+        .where(eq(topics.id, topicId));
       return {
         message: "Tópico atualizado com sucesso!",
         success: true,
@@ -213,10 +221,10 @@ export const TopicsService = {
     }
   },
 
-  deleteTopic: async (
-    topicId: string,
-    userLoggedId: string,
-  ): Promise<SuccessResponseInterface> => {
+  deleteTopic: async ({
+    topicId,
+    userLoggedId,
+  }: DeleteTopicInterface & { userLoggedId: string }): Promise<SuccessResponseInterface> => {
     try {
       const topicExist = await TopicsService.verifyTopicExist(topicId);
 

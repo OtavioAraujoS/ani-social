@@ -5,6 +5,7 @@ import { AuthService } from "./auth.service";
 const jwtSetup = jwt({
   name: "jwt",
   secret: process.env.JWT_SECRET || "",
+  exp: "1h",
 });
 
 export const authController = new Elysia({ prefix: "/auth" })

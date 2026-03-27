@@ -24,18 +24,36 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
         }),
         response: AnimeDetailResponseSchema,
       })
-      .post("/", ({ body }) => AnimeService.create(body), {
-        body: CreateAnimeSchema,
-        response: SuccessResponseSchema,
-      })
-      .patch("/", ({ body }) => AnimeService.update(body), {
-        body: UpdateAnimeSchema,
-        response: SuccessResponseSchema,
-      })
-      .patch("/image", ({ body }) => AnimeService.updateAnimeImage(body), {
-        body: UpdateAnimeImageSchema,
-        response: SuccessResponseSchema,
-      })
+      .post(
+        "/",
+        ({ body, user }) =>
+          AnimeService.create({ ...body, createdByUserId: user!.sub }),
+        {
+          body: CreateAnimeSchema,
+          response: SuccessResponseSchema,
+        },
+      )
+      .patch(
+        "/",
+        ({ body, user }) =>
+          AnimeService.update({ ...body, updatedByUserId: user!.sub }),
+        {
+          body: UpdateAnimeSchema,
+          response: SuccessResponseSchema,
+        },
+      )
+      .patch(
+        "/image",
+        ({ body, user }) =>
+          AnimeService.updateAnimeImage({
+            ...body,
+            updatedByUserId: user!.sub,
+          }),
+        {
+          body: UpdateAnimeImageSchema,
+          response: SuccessResponseSchema,
+        },
+      )
       .delete(
         "/:animeId",
         ({ params, user }) =>

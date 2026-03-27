@@ -24,18 +24,33 @@ export const UserController = new Elysia({ prefix: "/users" })
       .get("/:userId", ({ params }) => UserService.findById(params.userId), {
         response: UserResponseSchema,
       })
-      .patch("/", ({ body }) => UserService.update(body), {
-        body: UpdateUserSchema,
-        response: SuccessResponseSchema,
-      })
-      .patch("/password", ({ body }) => UserService.updatePassword(body), {
-        body: UpdateUserPasswordSchema,
-        response: SuccessResponseSchema,
-      })
-      .patch("/avatar", ({ body }) => UserService.updateUserAvatar(body), {
-        body: UpdateUserAvatarSchema,
-        response: SuccessResponseSchema,
-      }),
+      .patch(
+        "/",
+        ({ body, user }) =>
+          UserService.update({ ...body, userLoggedId: user!.sub }),
+        {
+          body: UpdateUserSchema,
+          response: SuccessResponseSchema,
+        },
+      )
+      .patch(
+        "/password",
+        ({ body, user }) =>
+          UserService.updatePassword({ ...body, userLoggedId: user!.sub }),
+        {
+          body: UpdateUserPasswordSchema,
+          response: SuccessResponseSchema,
+        },
+      )
+      .patch(
+        "/avatar",
+        ({ body, user }) =>
+          UserService.updateUserAvatar({ ...body, userLoggedId: user!.sub }),
+        {
+          body: UpdateUserAvatarSchema,
+          response: SuccessResponseSchema,
+        },
+      ),
   )
   .group("/admin", (app) =>
     app
@@ -43,8 +58,13 @@ export const UserController = new Elysia({ prefix: "/users" })
       .get("/", () => UserService.findAll(), {
         response: UserListResponseSchema,
       })
-      .delete("/", ({ body }) => UserService.delete(body), {
-        body: DeleteUserSchema,
-        response: SuccessResponseSchema,
-      }),
+      .delete(
+        "/",
+        ({ body, user }) =>
+          UserService.delete({ ...body, userLoggedId: user!.sub }),
+        {
+          body: DeleteUserSchema,
+          response: SuccessResponseSchema,
+        },
+      ),
   );

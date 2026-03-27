@@ -90,25 +90,29 @@ export const CommentsService = {
     }
   },
 
-  postCommentOnTopic: async (
-    data: CreateCommentInterface,
-  ): Promise<SuccessResponseInterface> => {
+  postCommentOnTopic: async ({
+    content,
+    topicId,
+    userLoggedId,
+  }: CreateCommentInterface & {
+    userLoggedId: string;
+  }): Promise<SuccessResponseInterface> => {
     try {
       await db.insert(comments).values({
-        content: data.content,
-        topicId: data.topicId,
-        createdByUserId: data.userLoggedId,
+        content,
+        topicId,
+        createdByUserId: userLoggedId,
       });
 
       const [{ count }] = await db
         .select({ count: sql<number>`count(*)` })
         .from(comments)
-        .where(eq(comments.topicId, data.topicId));
+        .where(eq(comments.topicId, topicId));
 
       await db
         .update(topics)
         .set({ comments: Number(count) })
-        .where(eq(topics.id, data.topicId));
+        .where(eq(topics.id, topicId));
       return {
         message: "Comentário criado com sucesso!",
         success: true,
@@ -121,13 +125,18 @@ export const CommentsService = {
     }
   },
 
-  updateComment: async (
-    data: UpdateCommentInterface,
-  ): Promise<SuccessResponseInterface> => {
+  updateComment: async ({
+    commentId,
+    content,
+    topicId,
+    userLoggedId,
+  }: UpdateCommentInterface & {
+    userLoggedId: string;
+  }): Promise<SuccessResponseInterface> => {
     try {
       const commentExist = await CommentsService.verifyCommentExist(
-        data.commentId,
-        data.topicId,
+        commentId,
+        topicId,
       );
 
       if (!commentExist) {
@@ -135,8 +144,8 @@ export const CommentsService = {
       }
 
       const userPermission = await CommentsService.verifyUserPermission(
-        data.commentId,
-        data.userLoggedId,
+        commentId,
+        userLoggedId,
       );
 
       if (!userPermission) {
@@ -146,10 +155,10 @@ export const CommentsService = {
       await db
         .update(comments)
         .set({
-          content: data.content,
+          content,
           updatedAt: new Date(),
         })
-        .where(eq(comments.id, data.commentId));
+        .where(eq(comments.id, commentId));
       return {
         message: "Comentário atualizado com sucesso!",
         success: true,
@@ -162,13 +171,17 @@ export const CommentsService = {
     }
   },
 
-  deleteComment: async (
-    data: DeleteCommentInterface,
-  ): Promise<SuccessResponseInterface> => {
+  deleteComment: async ({
+    commentId,
+    topicId,
+    userLoggedId,
+  }: DeleteCommentInterface & {
+    userLoggedId: string;
+  }): Promise<SuccessResponseInterface> => {
     try {
       const commentExist = await CommentsService.verifyCommentExist(
-        data.commentId,
-        data.topicId,
+        commentId,
+        topicId,
       );
 
       if (!commentExist) {
@@ -176,25 +189,25 @@ export const CommentsService = {
       }
 
       const userPermission = await CommentsService.verifyUserPermission(
-        data.commentId,
-        data.userLoggedId,
+        commentId,
+        userLoggedId,
       );
 
       if (!userPermission) {
         throw new Error("Usuário não autorizado.");
       }
 
-      await db.delete(comments).where(eq(comments.id, data.commentId));
+      await db.delete(comments).where(eq(comments.id, commentId));
 
       const [{ count }] = await db
         .select({ count: sql<number>`count(*)` })
         .from(comments)
-        .where(eq(comments.topicId, data.topicId));
+        .where(eq(comments.topicId, topicId));
 
       await db
         .update(topics)
         .set({ comments: Number(count) })
-        .where(eq(topics.id, data.topicId));
+        .where(eq(topics.id, topicId));
       return {
         message: "Comentário deletado com sucesso!",
         success: true,

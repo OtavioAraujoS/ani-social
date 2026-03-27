@@ -112,23 +112,26 @@ export const UserService = {
     }
   },
 
-  update: async (
-    data: UpdateUserInterface,
-  ): Promise<SuccessResponseInterface> => {
+  update: async ({
+    userId,
+    name,
+    userName,
+    userLoggedId,
+  }: UpdateUserInterface & { userLoggedId: string }): Promise<SuccessResponseInterface> => {
     try {
-      const userExist = await UserService.verifyUserExist(data.userId);
+      const userExist = await UserService.verifyUserExist(userId);
 
       if (userExist) {
         const userIsTheSameOrAdmin = await AuthService.userIsTheSameOrAdmin(
-          data.userId,
-          data.userLoggedId,
+          userId,
+          userLoggedId,
         );
 
         if (!userIsTheSameOrAdmin) {
           throw new Error("Usuário não autorizado.");
         }
 
-        await db.update(users).set(data).where(eq(users.id, data.userId));
+        await db.update(users).set({ name, userName }).where(eq(users.id, userId));
         return {
           message: "Usuário atualizado com sucesso!",
           success: true,
@@ -148,9 +151,9 @@ export const UserService = {
 
   updatePassword: async ({
     userId,
-    userLoggedId,
     password,
-  }: UpdateUserPasswordInterface): Promise<SuccessResponseInterface> => {
+    userLoggedId,
+  }: UpdateUserPasswordInterface & { userLoggedId: string }): Promise<SuccessResponseInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 
@@ -190,9 +193,9 @@ export const UserService = {
 
   updateUserAvatar: async ({
     userId,
-    userLoggedId,
     imageBase64Path,
-  }: UpdateUserAvatarInterface): Promise<SuccessResponseInterface> => {
+    userLoggedId,
+  }: UpdateUserAvatarInterface & { userLoggedId: string }): Promise<SuccessResponseInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 
@@ -230,7 +233,7 @@ export const UserService = {
   delete: async ({
     userId,
     userLoggedId,
-  }: DeleteUserInterface): Promise<SuccessResponseInterface> => {
+  }: DeleteUserInterface & { userLoggedId: string }): Promise<SuccessResponseInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 

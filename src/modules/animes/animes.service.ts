@@ -98,14 +98,21 @@ export const AnimeService = {
     }
   },
 
-  create: async (
-    anime: CreateAnimeInterface,
-  ): Promise<SuccessResponseInterface> => {
+  create: async ({
+    title,
+    description,
+    episodes,
+    review,
+    stars,
+    imageUrl,
+    status,
+    createdByUserId,
+  }: CreateAnimeInterface & { createdByUserId: string }): Promise<SuccessResponseInterface> => {
     try {
-      const duplicated = await AnimeService.duplicatedAnime(anime.title);
+      const duplicated = await AnimeService.duplicatedAnime(title);
 
       if (!duplicated) {
-        await db.insert(animes).values(anime);
+        await db.insert(animes).values({ title, description, episodes, review, stars, imageUrl, status, createdByUserId });
         return {
           message: "Anime cadastrado com sucesso!",
           success: true,
@@ -120,14 +127,24 @@ export const AnimeService = {
     }
   },
 
-  update: async (
-    anime: UpdateAnimeInterface,
-  ): Promise<SuccessResponseInterface> => {
+  update: async ({
+    animeId,
+    title,
+    description,
+    episodes,
+    review,
+    stars,
+    imageUrl,
+    status,
+    updatedByUserId,
+  }: UpdateAnimeInterface & { updatedByUserId: string }): Promise<SuccessResponseInterface> => {
     try {
-      const animeExist = await AnimeService.verifyAnimeExistence(anime.animeId);
+      const animeExist = await AnimeService.verifyAnimeExistence(animeId);
 
       if (animeExist) {
-        await db.update(animes).set(anime).where(eq(animes.id, anime.animeId));
+        await db.update(animes).set({ 
+          title, description, episodes, review, stars, imageUrl, status, updatedByUserId, updatedAt: new Date() 
+        }).where(eq(animes.id, animeId));
         return {
           message: "Anime atualizado com sucesso!",
           success: true,
@@ -142,23 +159,25 @@ export const AnimeService = {
     }
   },
 
-  updateAnimeImage: async (
-    anime: UpdateAnimeImageInterface,
-  ): Promise<SuccessResponseInterface> => {
+  updateAnimeImage: async ({
+    animeId,
+    imageUrl,
+    updatedByUserId,
+  }: UpdateAnimeImageInterface & { updatedByUserId: string }): Promise<SuccessResponseInterface> => {
     try {
-      const animeExist = await AnimeService.verifyAnimeExistence(anime.animeId);
+      const animeExist = await AnimeService.verifyAnimeExistence(animeId);
 
       if (animeExist) {
-        const avatarUrl = await uploadImage(anime.imageUrl, "animes");
+        const avatarUrl = await uploadImage(imageUrl, "animes");
 
         await db
           .update(animes)
           .set({
-            updatedByUserId: anime.updatedByUserId,
+            updatedByUserId: updatedByUserId,
             imageUrl: avatarUrl,
             updatedAt: new Date(),
           })
-          .where(eq(animes.id, anime.animeId));
+          .where(eq(animes.id, animeId));
         return {
           message: "Imagem do anime atualizada com sucesso!",
           success: true,

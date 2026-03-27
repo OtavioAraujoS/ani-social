@@ -27,18 +27,28 @@ export const TopicController = new Elysia({ prefix: "/topics" }).group(
           response: topicSchema,
         },
       )
-      .post("/", ({ body }) => TopicsService.createTopic(body), {
-        body: CreateTopicSchema,
-        response: SuccessResponseSchema,
-      })
-      .patch("/:topicId", ({ body }) => TopicsService.updateTopic(body), {
-        body: UpdateTopicSchema,
-        response: SuccessResponseSchema,
-      })
+      .post(
+        "/",
+        ({ body, user }) =>
+          TopicsService.createTopic({ ...body, userLoggedId: user!.sub }),
+        {
+          body: CreateTopicSchema,
+          response: SuccessResponseSchema,
+        },
+      )
+      .patch(
+        "/:topicId",
+        ({ body, user }) =>
+          TopicsService.updateTopic({ ...body, userLoggedId: user!.sub }),
+        {
+          body: UpdateTopicSchema,
+          response: SuccessResponseSchema,
+        },
+      )
       .delete(
         "/:topicId",
         ({ params, user }) =>
-          TopicsService.deleteTopic(params.topicId, user!.sub),
+          TopicsService.deleteTopic({ topicId: params.topicId, userLoggedId: user!.sub }),
         {
           params: t.Object({
             topicId: t.String({ format: "uuid" }),

@@ -35,8 +35,6 @@ export const CreateAnimeSchema = t.Object({
   review: t.Optional(t.String()),
   stars: t.Optional(t.Number()),
   imageUrl: t.Optional(t.String()),
-  createdByUserId: t.String(),
-  updatedByUserId: t.Optional(t.Nullable(t.String())),
   status: t.Optional(t.Enum(AnimeStatusEnum)),
 });
 
@@ -48,20 +46,16 @@ export const UpdateAnimeSchema = t.Object({
   review: t.Optional(t.String()),
   stars: t.Optional(t.Number()),
   imageUrl: t.Optional(t.String()),
-  createdByUserId: t.Optional(t.String()),
-  updatedByUserId: t.String(),
   status: t.Optional(t.Enum(AnimeStatusEnum)),
 });
 
 export const UpdateAnimeImageSchema = t.Object({
   animeId: t.String(),
   imageUrl: t.String(),
-  updatedByUserId: t.String(),
 });
 
 export const DeleteAnimeSchema = t.Object({
   animeId: t.String(),
-  userLoggedId: t.String(),
 });
 
 export const AnimeDetailResponseSchema = t.Intersect([

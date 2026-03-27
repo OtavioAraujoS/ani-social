@@ -15,19 +15,16 @@ export const CommentListSchema = t.Array(CommentSchema);
 export const CreateCommentSchema = t.Object({
   content: t.String(),
   topicId: t.String(),
-  userLoggedId: t.String(),
 });
 
 export const UpdateCommentSchema = t.Object({
   commentId: t.String(),
   content: t.String(),
-  userLoggedId: t.String(),
   topicId: t.String(),
 });
 
 export const DeleteCommentSchema = t.Object({
   commentId: t.String(),
-  userLoggedId: t.String(),
   topicId: t.String(),
 });
 

@@ -24,16 +24,34 @@ export const CommentsController = new Elysia({ prefix: "/comments" }).group(
           response: CommentListSchema,
         },
       )
-      .post("/", ({ body }) => CommentsService.postCommentOnTopic(body), {
-        body: CreateCommentSchema,
-        response: SuccessResponseSchema,
-      })
-      .patch("/", ({ body }) => CommentsService.updateComment(body), {
-        body: UpdateCommentSchema,
-        response: SuccessResponseSchema,
-      })
-      .delete("/", ({ body }) => CommentsService.deleteComment(body), {
-        body: DeleteCommentSchema,
-        response: SuccessResponseSchema,
-      }),
+      .post(
+        "/",
+        ({ body, user }) =>
+          CommentsService.postCommentOnTopic({
+            ...body,
+            userLoggedId: user!.sub,
+          }),
+        {
+          body: CreateCommentSchema,
+          response: SuccessResponseSchema,
+        },
+      )
+      .patch(
+        "/",
+        ({ body, user }) =>
+          CommentsService.updateComment({ ...body, userLoggedId: user!.sub }),
+        {
+          body: UpdateCommentSchema,
+          response: SuccessResponseSchema,
+        },
+      )
+      .delete(
+        "/",
+        ({ body, user }) =>
+          CommentsService.deleteComment({ ...body, userLoggedId: user!.sub }),
+        {
+          body: DeleteCommentSchema,
+          response: SuccessResponseSchema,
+        },
+      ),
 );

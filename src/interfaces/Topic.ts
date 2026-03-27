@@ -20,19 +20,16 @@ export const CreateTopicSchema = t.Object({
   title: t.String(),
   description: t.String(),
   animeId: t.String(),
-  userLoggedId: t.String(),
 });
 
 export const UpdateTopicSchema = t.Object({
   topicId: t.String(),
   title: t.String(),
   description: t.String(),
-  userLoggedId: t.String(),
 });
 
 export const DeleteTopicSchema = t.Object({
   topicId: t.String(),
-  userLoggedId: t.String(),
 });
 
 export type TopicResponseInterface = typeof topicSchema.static;

@@ -11,6 +11,7 @@ import {
 } from "../../interfaces/User";
 import { adminMiddleware, authPlugin } from "../auth/auth.middleware";
 import { SuccessResponseSchema } from "../../interfaces/Success";
+import { PaginationQuerySchema } from "../../interfaces/Pagination";
 
 export const UserController = new Elysia({ prefix: "/users" })
   .post("/", ({ body }) => UserService.create(body), {
@@ -55,7 +56,8 @@ export const UserController = new Elysia({ prefix: "/users" })
   .group("/admin", (app) =>
     app
       .use(adminMiddleware)
-      .get("/", () => UserService.findAll(), {
+      .get("/", ({ query }) => UserService.findAll({ page: query.page ?? 1, limit: query.limit ?? 20 }), {
+        query: PaginationQuerySchema,
         response: UserListResponseSchema,
       })
       .delete(

@@ -13,6 +13,7 @@ import {
 import { AuthService } from "../auth/auth.service";
 import { uploadImage } from "../../lib/cloudinary";
 import { SuccessResponseInterface } from "../../interfaces/Success";
+import xss from "xss";
 
 export const UserService = {
   verifyUserExist: async (userId: string): Promise<boolean> => {
@@ -40,7 +41,13 @@ export const UserService = {
     }
   },
 
-  findAll: async (): Promise<UsersListResponseInterface> => {
+  findAll: async ({
+    page,
+    limit,
+  }: {
+    page: number;
+    limit: number;
+  }): Promise<UsersListResponseInterface> => {
     try {
       return await db
         .select({
@@ -51,7 +58,9 @@ export const UserService = {
           createdAt: users.createdAt,
           updatedAt: users.updatedAt,
         })
-        .from(users);
+        .from(users)
+        .limit(limit)
+        .offset((page - 1) * limit);
     } catch (error) {
       throw new Error("Não foi possível listar os usuários - " + error, {
         cause: error,
@@ -97,6 +106,7 @@ export const UserService = {
         .insert(users)
         .values({
           ...data,
+          name: xss(data.name),
           password: hashedPassword,
         })
         .returning();
@@ -117,7 +127,9 @@ export const UserService = {
     name,
     userName,
     userLoggedId,
-  }: UpdateUserInterface & { userLoggedId: string }): Promise<SuccessResponseInterface> => {
+  }: UpdateUserInterface & {
+    userLoggedId: string;
+  }): Promise<SuccessResponseInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 
@@ -131,7 +143,12 @@ export const UserService = {
           throw new Error("Usuário não autorizado.");
         }
 
-        await db.update(users).set({ name, userName }).where(eq(users.id, userId));
+        const sanitizedName = name ? xss(name) : undefined;
+
+        await db
+          .update(users)
+          .set({ name: sanitizedName, userName })
+          .where(eq(users.id, userId));
         return {
           message: "Usuário atualizado com sucesso!",
           success: true,
@@ -153,7 +170,9 @@ export const UserService = {
     userId,
     password,
     userLoggedId,
-  }: UpdateUserPasswordInterface & { userLoggedId: string }): Promise<SuccessResponseInterface> => {
+  }: UpdateUserPasswordInterface & {
+    userLoggedId: string;
+  }): Promise<SuccessResponseInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 
@@ -195,7 +214,9 @@ export const UserService = {
     userId,
     imageBase64Path,
     userLoggedId,
-  }: UpdateUserAvatarInterface & { userLoggedId: string }): Promise<SuccessResponseInterface> => {
+  }: UpdateUserAvatarInterface & {
+    userLoggedId: string;
+  }): Promise<SuccessResponseInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 
@@ -233,7 +254,9 @@ export const UserService = {
   delete: async ({
     userId,
     userLoggedId,
-  }: DeleteUserInterface & { userLoggedId: string }): Promise<SuccessResponseInterface> => {
+  }: DeleteUserInterface & {
+    userLoggedId: string;
+  }): Promise<SuccessResponseInterface> => {
     try {
       const userExist = await UserService.verifyUserExist(userId);
 

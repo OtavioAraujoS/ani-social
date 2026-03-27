@@ -9,13 +9,15 @@ import {
   UpdateAnimeSchema,
 } from "../../interfaces/Anime";
 import { SuccessResponseSchema } from "../../interfaces/Success";
+import { PaginationQuerySchema } from "../../interfaces/Pagination";
 
 export const AnimeController = new Elysia({ prefix: "/animes" }).group(
   "",
   (app) =>
     app
       .use(authPlugin)
-      .get("/", () => AnimeService.findAll(), {
+      .get("/", ({ query }) => AnimeService.findAll({ page: query.page ?? 1, limit: query.limit ?? 20 }), {
+        query: PaginationQuerySchema,
         response: AnimeListResponseSchema,
       })
       .get("/:animeId", ({ params }) => AnimeService.findById(params.animeId), {

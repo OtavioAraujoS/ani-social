@@ -8,13 +8,15 @@ import {
   UpdateTopicSchema,
 } from "../../interfaces/Topic";
 import { SuccessResponseSchema } from "../../interfaces/Success";
+import { PaginationQuerySchema } from "../../interfaces/Pagination";
 
 export const TopicController = new Elysia({ prefix: "/topics" }).group(
   "",
   (app) =>
     app
       .use(authPlugin)
-      .get("/", () => TopicsService.getAllTopics(), {
+      .get("/", ({ query }) => TopicsService.getAllTopics({ page: query.page ?? 1, limit: query.limit ?? 20 }), {
+        query: PaginationQuerySchema,
         response: ListTopicsSchema,
       })
       .get(

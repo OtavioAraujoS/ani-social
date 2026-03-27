@@ -10,8 +10,8 @@ import { animes, users } from "../../db/schema";
 import { eq, aliasedTable } from "drizzle-orm";
 import { SuccessResponseInterface } from "../../interfaces/Success";
 import { uploadImage } from "../../lib/cloudinary";
-import { UserService } from "../users/users.service";
 import { AuthService } from "../auth/auth.service";
+import xss from "xss";
 
 export const AnimeService = {
   verifyAnimeExistence: async (animeId: string): Promise<boolean> => {
@@ -44,9 +44,19 @@ export const AnimeService = {
     }
   },
 
-  findAll: async (): Promise<AnimeListResponseInterface> => {
+  findAll: async ({
+    page,
+    limit,
+  }: {
+    page: number;
+    limit: number;
+  }): Promise<AnimeListResponseInterface> => {
     try {
-      return await db.select().from(animes);
+      return await db
+        .select()
+        .from(animes)
+        .limit(limit)
+        .offset((page - 1) * limit);
     } catch (error) {
       throw new Error("Não foi possível verificar os animes - " + error, {
         cause: error,
@@ -107,12 +117,23 @@ export const AnimeService = {
     imageUrl,
     status,
     createdByUserId,
-  }: CreateAnimeInterface & { createdByUserId: string }): Promise<SuccessResponseInterface> => {
+  }: CreateAnimeInterface & {
+    createdByUserId: string;
+  }): Promise<SuccessResponseInterface> => {
     try {
       const duplicated = await AnimeService.duplicatedAnime(title);
 
       if (!duplicated) {
-        await db.insert(animes).values({ title, description, episodes, review, stars, imageUrl, status, createdByUserId });
+        await db.insert(animes).values({
+          title: xss(title),
+          description: xss(description),
+          episodes,
+          review: xss(review || ""),
+          stars,
+          imageUrl,
+          status,
+          createdByUserId,
+        });
         return {
           message: "Anime cadastrado com sucesso!",
           success: true,
@@ -137,14 +158,27 @@ export const AnimeService = {
     imageUrl,
     status,
     updatedByUserId,
-  }: UpdateAnimeInterface & { updatedByUserId: string }): Promise<SuccessResponseInterface> => {
+  }: UpdateAnimeInterface & {
+    updatedByUserId: string;
+  }): Promise<SuccessResponseInterface> => {
     try {
       const animeExist = await AnimeService.verifyAnimeExistence(animeId);
 
       if (animeExist) {
-        await db.update(animes).set({ 
-          title, description, episodes, review, stars, imageUrl, status, updatedByUserId, updatedAt: new Date() 
-        }).where(eq(animes.id, animeId));
+        await db
+          .update(animes)
+          .set({
+            title: title ? xss(title) : undefined,
+            description: description ? xss(description) : undefined,
+            episodes,
+            review: review ? xss(review) : undefined,
+            stars,
+            imageUrl,
+            status,
+            updatedByUserId,
+            updatedAt: new Date(),
+          })
+          .where(eq(animes.id, animeId));
         return {
           message: "Anime atualizado com sucesso!",
           success: true,
@@ -163,7 +197,9 @@ export const AnimeService = {
     animeId,
     imageUrl,
     updatedByUserId,
-  }: UpdateAnimeImageInterface & { updatedByUserId: string }): Promise<SuccessResponseInterface> => {
+  }: UpdateAnimeImageInterface & {
+    updatedByUserId: string;
+  }): Promise<SuccessResponseInterface> => {
     try {
       const animeExist = await AnimeService.verifyAnimeExistence(animeId);
 

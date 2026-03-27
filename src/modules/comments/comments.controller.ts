@@ -8,6 +8,7 @@ import {
   UpdateCommentSchema,
 } from "../../interfaces/Comments";
 import { SuccessResponseSchema } from "../../interfaces/Success";
+import { PaginationQuerySchema } from "../../interfaces/Pagination";
 
 export const CommentsController = new Elysia({ prefix: "/comments" }).group(
   "",
@@ -16,11 +17,12 @@ export const CommentsController = new Elysia({ prefix: "/comments" }).group(
       .use(authPlugin)
       .get(
         "/:topicId",
-        ({ params }) => CommentsService.getCommentsByTopicId(params.topicId),
+        ({ params, query }) => CommentsService.getCommentsByTopicId({ topicId: params.topicId, page: query.page ?? 1, limit: query.limit ?? 20 }),
         {
           params: t.Object({
             topicId: t.String({ format: "uuid" }),
           }),
+          query: PaginationQuerySchema,
           response: CommentListSchema,
         },
       )

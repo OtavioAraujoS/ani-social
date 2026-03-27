@@ -10,6 +10,7 @@ import {
 import { SuccessResponseInterface } from "../../interfaces/Success";
 import { AuthService } from "../auth/auth.service";
 import { TopicsService } from "../topics/topics.service";
+import xss from "xss";
 
 export const CommentsService = {
   verifyCommentExist: async (
@@ -52,9 +53,15 @@ export const CommentsService = {
     return AuthService.userIsTheSameOrAdmin(comment.createdByUserId, userId);
   },
 
-  getCommentsByTopicId: async (
-    topicId: string,
-  ): Promise<CommentListResponseInterface> => {
+  getCommentsByTopicId: async ({
+    topicId,
+    page,
+    limit,
+  }: {
+    topicId: string;
+    page: number;
+    limit: number;
+  }): Promise<CommentListResponseInterface> => {
     try {
       const topicIdExist = await TopicsService.verifyTopicExist(topicId);
 
@@ -73,7 +80,9 @@ export const CommentsService = {
         })
         .from(comments)
         .leftJoin(users, eq(comments.createdByUserId, users.id))
-        .where(eq(comments.topicId, topicId));
+        .where(eq(comments.topicId, topicId))
+        .limit(limit)
+        .offset((page - 1) * limit);
 
       return result.map((row) => ({
         id: row.comment.id,
@@ -99,7 +108,7 @@ export const CommentsService = {
   }): Promise<SuccessResponseInterface> => {
     try {
       await db.insert(comments).values({
-        content,
+        content: xss(content),
         topicId,
         createdByUserId: userLoggedId,
       });
@@ -155,7 +164,7 @@ export const CommentsService = {
       await db
         .update(comments)
         .set({
-          content,
+          content: xss(content),
           updatedAt: new Date(),
         })
         .where(eq(comments.id, commentId));

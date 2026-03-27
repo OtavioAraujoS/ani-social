@@ -10,6 +10,7 @@ import {
 } from "../../interfaces/Topic";
 import { SuccessResponseInterface } from "../../interfaces/Success";
 import { AuthService } from "../auth/auth.service";
+import xss from "xss";
 
 export const TopicsService = {
   verifyTopicExist: async (topicId: string): Promise<boolean> => {
@@ -37,7 +38,13 @@ export const TopicsService = {
     return AuthService.userIsTheSameOrAdmin(userId, topic.createdByUserId);
   },
 
-  getAllTopics: async (): Promise<ListTopicsResponseInterface> => {
+  getAllTopics: async ({
+    page,
+    limit,
+  }: {
+    page: number;
+    limit: number;
+  }): Promise<ListTopicsResponseInterface> => {
     try {
       const updatedByUsers = aliasedTable(users, "updatedByUsers");
 
@@ -63,10 +70,9 @@ export const TopicsService = {
         .from(topics)
         .leftJoin(animes, eq(topics.animeId, animes.id))
         .leftJoin(users, eq(topics.createdByUserId, users.id))
-        .leftJoin(
-          updatedByUsers,
-          eq(topics.updatedByUserId, updatedByUsers.id),
-        );
+        .leftJoin(updatedByUsers, eq(topics.updatedByUserId, updatedByUsers.id))
+        .limit(limit)
+        .offset((page - 1) * limit);
 
       return result.map((row) => {
         const updatedByUser = row.updatedByUserId?.userId
@@ -160,8 +166,8 @@ export const TopicsService = {
   }): Promise<SuccessResponseInterface> => {
     try {
       await db.insert(topics).values({
-        title,
-        description,
+        title: xss(title),
+        description: xss(description),
         animeId,
         createdByUserId: userLoggedId,
       });
@@ -204,8 +210,8 @@ export const TopicsService = {
       await db
         .update(topics)
         .set({
-          title,
-          description,
+          title: title ? xss(title) : undefined,
+          description: description ? xss(description) : undefined,
           updatedAt: new Date(),
         })
         .where(eq(topics.id, topicId));
@@ -224,7 +230,9 @@ export const TopicsService = {
   deleteTopic: async ({
     topicId,
     userLoggedId,
-  }: DeleteTopicInterface & { userLoggedId: string }): Promise<SuccessResponseInterface> => {
+  }: DeleteTopicInterface & {
+    userLoggedId: string;
+  }): Promise<SuccessResponseInterface> => {
     try {
       const topicExist = await TopicsService.verifyTopicExist(topicId);
 

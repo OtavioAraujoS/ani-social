@@ -5,14 +5,23 @@ import { authController } from "./modules/auth/auth.controller";
 import { AnimeController } from "./modules/animes/animes.controller";
 import { TopicController } from "./modules/topics/topics.controller";
 import { CommentsController } from "./modules/comments/comments.controller";
+import { rateLimit } from "elysia-rate-limit";
+import { cors } from "@elysiajs/cors";
 
 const app = new Elysia()
+  .use(cors())
+  .onAfterHandle(({ set }) => {
+    set.headers["X-Content-Type-Options"] = "nosniff";
+    set.headers["X-Frame-Options"] = "DENY";
+    set.headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+  })
   .use(swagger({ path: "/docs" }))
   .get("/", ({ redirect }) => {
     return redirect("/docs");
   })
   .group("/api", (app) =>
     app
+      .use(rateLimit({ duration: 60000, max: 100 }))
       .use(authController)
       .use(UserController)
       .use(AnimeController)

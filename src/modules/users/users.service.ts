@@ -144,10 +144,15 @@ export const UserService = {
         }
 
         const sanitizedName = name ? xss(name) : undefined;
+        const sanitizedUserName = userName ? xss(userName) : undefined;
 
         await db
           .update(users)
-          .set({ name: sanitizedName, userName })
+          .set({
+            name: sanitizedName,
+            userName: sanitizedUserName,
+            updatedAt: new Date(),
+          })
           .where(eq(users.id, userId));
         return {
           message: "Usuário atualizado com sucesso!",
@@ -159,7 +164,7 @@ export const UserService = {
         cause: "Usuário não encontrado ou não autorizado.",
       });
     } catch (error) {
-      console.log(error);
+      console.error("DIAGNOSTICO UPDATE:", { error, userId, userLoggedId });
       throw new Error("Não foi possível atualizar o usuário - " + error, {
         cause: error,
       });
@@ -201,6 +206,7 @@ export const UserService = {
         cause: "Usuário não encontrado ou não autorizado.",
       });
     } catch (error) {
+      console.error("DIAGNOSTICO PASSWORD:", { error, userId, userLoggedId });
       throw new Error(
         "Não foi possível atualizar a senha do usuário- " + error,
         {
@@ -245,6 +251,7 @@ export const UserService = {
         cause: "Usuário não encontrado ou não autorizado.",
       });
     } catch (error) {
+      console.error("DIAGNOSTICO AVATAR:", { error, userId, userLoggedId });
       throw new Error("Não foi possível atualizar o avatar- " + error, {
         cause: error,
       });

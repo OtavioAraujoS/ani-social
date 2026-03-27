@@ -40,3 +40,15 @@ export const animes = pgTable("animes", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export const topics = pgTable("topics", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  animeId: uuid("anime_id").notNull(),
+  createdByUserId: uuid("created_by_user_id").notNull(),
+  updatedByUserId: uuid("updated_by_user_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  comments: integer("comments").default(0).notNull(),
+});

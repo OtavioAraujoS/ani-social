@@ -20,6 +20,12 @@ export const AnimeSchema = t.Object({
   updatedAt: t.Date(),
 });
 
+export const AnimeSchemaOnTopic = t.Object({
+  id: t.String(),
+  title: t.String(),
+  imageUrl: t.Nullable(t.String()),
+});
+
 export const AnimeListResponseSchema = t.Array(AnimeSchema);
 
 export const CreateAnimeSchema = t.Object({

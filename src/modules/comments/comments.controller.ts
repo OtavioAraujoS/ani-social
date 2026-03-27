@@ -28,16 +28,12 @@ export const CommentsController = new Elysia({ prefix: "/comments" }).group(
         body: CreateCommentSchema,
         response: SuccessResponseSchema,
       })
-      .patch("/:commentId", ({ body }) => CommentsService.updateComment(body), {
+      .patch("/", ({ body }) => CommentsService.updateComment(body), {
         body: UpdateCommentSchema,
         response: SuccessResponseSchema,
       })
-      .delete(
-        "/:commentId",
-        ({ body }) => CommentsService.deleteComment(body),
-        {
-          body: DeleteCommentSchema,
-          response: SuccessResponseSchema,
-        },
-      ),
+      .delete("/", ({ body }) => CommentsService.deleteComment(body), {
+        body: DeleteCommentSchema,
+        response: SuccessResponseSchema,
+      }),
 );

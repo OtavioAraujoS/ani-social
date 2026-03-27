@@ -37,6 +37,21 @@ export const CommentsService = {
     }
   },
 
+  verifyUserPermission: async (
+    commentId: string,
+    userId: string,
+  ): Promise<boolean> => {
+    const comment = await db.query.comments.findFirst({
+      where: eq(comments.id, commentId),
+    });
+
+    if (!comment) {
+      return false;
+    }
+
+    return AuthService.userIsTheSameOrAdmin(comment.createdByUserId, userId);
+  },
+
   getCommentsByTopicId: async (
     topicId: string,
   ): Promise<CommentListResponseInterface> => {
@@ -119,9 +134,9 @@ export const CommentsService = {
         throw new Error("Comentário não encontrado.");
       }
 
-      const userPermission = await AuthService.userIsTheSameOrAdmin(
-        data.userLoggedId,
+      const userPermission = await CommentsService.verifyUserPermission(
         data.commentId,
+        data.userLoggedId,
       );
 
       if (!userPermission) {
@@ -160,9 +175,9 @@ export const CommentsService = {
         throw new Error("Comentário não encontrado.");
       }
 
-      const userPermission = await AuthService.userIsTheSameOrAdmin(
-        data.userLoggedId,
+      const userPermission = await CommentsService.verifyUserPermission(
         data.commentId,
+        data.userLoggedId,
       );
 
       if (!userPermission) {

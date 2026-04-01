@@ -15,17 +15,25 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
   "",
   (app) =>
     app
-      .use(authPlugin)
-      .get("/", ({ query }) => AnimeService.findAll({ page: query.page ?? 1, limit: query.limit ?? 20 }), {
-        query: PaginationQuerySchema,
-        response: AnimeListResponseSchema,
-      })
+      .get(
+        "/",
+        ({ query }) =>
+          AnimeService.findAll({
+            page: query.page ?? 1,
+            limit: query.limit ?? 20,
+          }),
+        {
+          query: PaginationQuerySchema,
+          response: AnimeListResponseSchema,
+        },
+      )
       .get("/:animeId", ({ params }) => AnimeService.findById(params.animeId), {
         params: t.Object({
           animeId: t.String({ format: "uuid" }),
         }),
         response: AnimeDetailResponseSchema,
       })
+      .use(authPlugin)
       .post(
         "/",
         ({ body, user }) =>

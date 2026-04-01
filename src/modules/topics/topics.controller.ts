@@ -14,11 +14,18 @@ export const TopicController = new Elysia({ prefix: "/topics" }).group(
   "",
   (app) =>
     app
-      .use(authPlugin)
-      .get("/", ({ query }) => TopicsService.getAllTopics({ page: query.page ?? 1, limit: query.limit ?? 20 }), {
-        query: PaginationQuerySchema,
-        response: ListTopicsSchema,
-      })
+      .get(
+        "/",
+        ({ query }) =>
+          TopicsService.getAllTopics({
+            page: query.page ?? 1,
+            limit: query.limit ?? 20,
+          }),
+        {
+          query: PaginationQuerySchema,
+          response: ListTopicsSchema,
+        },
+      )
       .get(
         "/:topicId",
         ({ params }) => TopicsService.getTopicById(params.topicId),
@@ -29,6 +36,7 @@ export const TopicController = new Elysia({ prefix: "/topics" }).group(
           response: topicSchema,
         },
       )
+      .use(authPlugin)
       .post(
         "/",
         ({ body, user }) =>
@@ -50,7 +58,10 @@ export const TopicController = new Elysia({ prefix: "/topics" }).group(
       .delete(
         "/:topicId",
         ({ params, user }) =>
-          TopicsService.deleteTopic({ topicId: params.topicId, userLoggedId: user!.sub }),
+          TopicsService.deleteTopic({
+            topicId: params.topicId,
+            userLoggedId: user!.sub,
+          }),
         {
           params: t.Object({
             topicId: t.String({ format: "uuid" }),

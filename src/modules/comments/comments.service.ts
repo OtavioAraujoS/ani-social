@@ -84,14 +84,20 @@ export const CommentsService = {
         .limit(limit)
         .offset((page - 1) * limit);
 
-      return result.map((row) => ({
-        id: row.comment.id,
-        content: row.comment.content,
-        topicId: row.comment.topicId,
-        createdByUserId: row.createdByUserId!,
-        createdAt: row.comment.createdAt.toISOString(),
-        updatedAt: row.comment.updatedAt.toISOString(),
-      }));
+      return result.map((row) => {
+        const createdByUser = row.createdByUserId?.userId
+          ? row.createdByUserId
+          : null;
+
+        return {
+          id: row.comment.id,
+          content: row.comment.content,
+          topicId: row.comment.topicId,
+          createdByUserId: createdByUser as any,
+          createdAt: row.comment.createdAt.toISOString(),
+          updatedAt: row.comment.updatedAt.toISOString(),
+        };
+      });
     } catch (error) {
       throw new Error("Não foi possível listar os comentários - " + error, {
         cause: error,

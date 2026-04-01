@@ -75,6 +75,10 @@ export const TopicsService = {
         .offset((page - 1) * limit);
 
       return result.map((row) => {
+        const createdByUser = row.createdByUserId?.userId
+          ? row.createdByUserId
+          : null;
+
         const updatedByUser = row.updatedByUserId?.userId
           ? row.updatedByUserId
           : null;
@@ -85,7 +89,7 @@ export const TopicsService = {
         return {
           ...restTopic,
           animeInfos: row.animeInfos!,
-          createdByUserId: row.createdByUserId!,
+          createdByUserId: createdByUser,
           updatedByUserId: updatedByUser,
         };
       });
@@ -136,6 +140,10 @@ export const TopicsService = {
       }
 
       const row = result[0];
+      const createdByUser = row.createdByUserId?.userId
+        ? row.createdByUserId
+        : null;
+
       const updatedByUser = row.updatedByUserId?.userId
         ? row.updatedByUserId
         : null;
@@ -146,7 +154,7 @@ export const TopicsService = {
       return {
         ...restTopic,
         animeInfos: row.animeInfos!,
-        createdByUserId: row.createdByUserId!,
+        createdByUserId: createdByUser,
         updatedByUserId: updatedByUser,
       };
     } catch (error) {

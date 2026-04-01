@@ -7,7 +7,7 @@ export const topicSchema = t.Object({
   title: t.String(),
   description: t.String(),
   animeInfos: AnimeSchemaOnTopic,
-  createdByUserId: UserInfoSchema,
+  createdByUserId: t.Nullable(UserInfoSchema),
   updatedByUserId: t.Nullable(UserInfoSchema),
   createdAt: t.Date(),
   updatedAt: t.Date(),

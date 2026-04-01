@@ -5,7 +5,7 @@ export const CommentSchema = t.Object({
   id: t.String(),
   content: t.String(),
   topicId: t.String(),
-  createdByUserId: UserInfoSchema,
+  createdByUserId: t.Nullable(UserInfoSchema),
   createdAt: t.String(),
   updatedAt: t.String(),
 });

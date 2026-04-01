@@ -35,7 +35,7 @@ export const TopicsService = {
       return false;
     }
 
-    return AuthService.userIsTheSameOrAdmin(userId, topic.createdByUserId);
+    return AuthService.userIsTheSameOrAdmin(topic.createdByUserId, userId);
   },
 
   getAllTopics: async ({

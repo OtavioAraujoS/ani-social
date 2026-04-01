@@ -8,17 +8,20 @@ cloudinary.config({
 });
 
 export const uploadImage = async (
-  imageBase64Path: string,
+  imageSource: string,
   folder: string,
 ): Promise<string> => {
   const base64Regex = /^data:image\/[a-zA-Z]+;base64,/;
-  if (!base64Regex.test(imageBase64Path)) {
+  const isUrl =
+    imageSource.startsWith("http://") || imageSource.startsWith("https://");
+
+  if (!base64Regex.test(imageSource) && !isUrl) {
     throw new Error(
-      "Payload de imagem inválido. Apenas URIs completas contendo data:image/[ext];base64, são suportadas.",
+      "Payload de imagem inválido. Apenas URIs base64 (data:image/[ext];base64,) ou URLs (http/https) são suportadas.",
     );
   }
 
-  const uploadResult = await cloudinary.uploader.upload(imageBase64Path, {
+  const uploadResult = await cloudinary.uploader.upload(imageSource, {
     folder,
   });
   return uploadResult.secure_url;

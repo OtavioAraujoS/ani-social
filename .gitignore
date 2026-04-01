@@ -42,4 +42,10 @@ yarn-error.log*
 package-lock.json
 **/*.bun
 
+# agent skills
+.agents
+.claude
+.cursor
+.windsurf
+
 .vscode

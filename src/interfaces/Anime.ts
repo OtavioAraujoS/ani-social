@@ -61,7 +61,7 @@ export const DeleteAnimeSchema = t.Object({
 export const AnimeDetailResponseSchema = t.Intersect([
   AnimeSchema,
   t.Object({
-    createdByUser: UserInfoSchema,
+    createdByUser: t.Nullable(UserInfoSchema),
     updatedByUser: t.Nullable(UserInfoSchema),
   }),
 ]);

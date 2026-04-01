@@ -11,6 +11,7 @@ import { eq, aliasedTable } from "drizzle-orm";
 import { SuccessResponseInterface } from "../../interfaces/Success";
 import { uploadImage } from "../../lib/cloudinary";
 import { AuthService } from "../auth/auth.service";
+import { UserService } from "../users/users.service";
 import xss from "xss";
 
 export const AnimeService = {
@@ -89,13 +90,19 @@ export const AnimeService = {
 
       if (!result) throw new Error("Anime não encontrado");
 
+      const { createdByUserId, updatedByUserId, ...animeData } = result.anime;
+
+      const createdByUser = result.createdByUser?.userId
+        ? result.createdByUser
+        : null;
+
       const updatedByUser = result.updatedByUser?.userId
         ? result.updatedByUser
         : null;
 
       return {
-        ...result.anime,
-        createdByUser: result.createdByUser! as any,
+        ...animeData,
+        createdByUser: createdByUser as any,
         updatedByUser: updatedByUser as any,
       };
     } catch (error) {
@@ -121,6 +128,12 @@ export const AnimeService = {
     createdByUserId: string;
   }): Promise<SuccessResponseInterface> => {
     try {
+      const userExist = await UserService.verifyUserExist(createdByUserId);
+
+      if (!userExist) {
+        throw new Error("Usuário não encontrado ou não autorizado.");
+      }
+
       const duplicated = await AnimeService.duplicatedAnime(title);
 
       if (!duplicated) {
@@ -162,6 +175,11 @@ export const AnimeService = {
     updatedByUserId: string;
   }): Promise<SuccessResponseInterface> => {
     try {
+      const userExist = await UserService.verifyUserExist(updatedByUserId);
+
+      if (!userExist) {
+        throw new Error("Usuário não encontrado ou não autorizado.");
+      }
       const animeExist = await AnimeService.verifyAnimeExistence(animeId);
 
       if (animeExist) {
@@ -201,6 +219,11 @@ export const AnimeService = {
     updatedByUserId: string;
   }): Promise<SuccessResponseInterface> => {
     try {
+      const userExist = await UserService.verifyUserExist(updatedByUserId);
+
+      if (!userExist) {
+        throw new Error("Usuário não encontrado ou não autorizado.");
+      }
       const animeExist = await AnimeService.verifyAnimeExistence(animeId);
 
       if (animeExist) {

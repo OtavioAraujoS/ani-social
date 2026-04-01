@@ -11,6 +11,8 @@ import {
 import { SuccessResponseInterface } from "../../interfaces/Success";
 import { AuthService } from "../auth/auth.service";
 import xss from "xss";
+import { UserService } from "../users/users.service";
+import { AnimeService } from "../animes/animes.service";
 
 export const TopicsService = {
   verifyTopicExist: async (topicId: string): Promise<boolean> => {
@@ -173,6 +175,15 @@ export const TopicsService = {
     userLoggedId: string;
   }): Promise<SuccessResponseInterface> => {
     try {
+      const [userExist, animeExist] = await Promise.all([
+        UserService.verifyUserExist(userLoggedId),
+        AnimeService.verifyAnimeExistence(animeId),
+      ]);
+
+      if (!userExist || !animeExist) {
+        throw new Error("Usuário ou anime não encontrado.");
+      }
+
       await db.insert(topics).values({
         title: xss(title),
         description: xss(description),
@@ -200,6 +211,11 @@ export const TopicsService = {
     userLoggedId: string;
   }): Promise<SuccessResponseInterface> => {
     try {
+      const userExist = await UserService.verifyUserExist(userLoggedId);
+
+      if (!userExist) {
+        throw new Error("Usuário não encontrado ou não autorizado.");
+      }
       const topicExist = await TopicsService.verifyTopicExist(topicId);
 
       if (!topicExist) {

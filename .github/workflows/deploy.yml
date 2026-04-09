@@ -37,6 +37,17 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Verify GitHub Secrets
+        run: |
+          if [ -z "${{ secrets.DATABASE_URL }}" ]; then
+            echo "::error::DATABASE_URL secret is MISSING in GitHub Settings (Settings > Secrets and variables > Actions)!"
+            exit 1
+          fi
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
+            echo "::error::RENDER_DEPLOY_HOOK secret is MISSING in GitHub Settings!"
+            exit 1
+          fi
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
 

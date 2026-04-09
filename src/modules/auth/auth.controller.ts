@@ -25,6 +25,7 @@ export const authController = new Elysia({ prefix: "/auth" })
           userName: user.userName,
           userId: user.id,
           createdAt: user.createdAt,
+          avatar: user.avatarUrl,
         });
 
         return {

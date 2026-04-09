@@ -10,7 +10,8 @@
     "db:up": "docker compose up -d --build app && bun run db:migrate",
     "db:down": "docker compose down",
     "db:migrate:prod": "bun x drizzle-kit migrate",
-    "db:studio": "bun x drizzle-kit studio"
+    "db:studio": "bun x drizzle-kit studio",
+    "check:types": "tsc --noEmit"
   },
   "dependencies": {
     "@elysiajs/cookie": "^0.8.0",

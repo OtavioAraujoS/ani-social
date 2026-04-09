@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "../../db";
-import { users } from "../../db/schema";
+import { users, animes, topics, comments } from "../../db/schema";
 import {
   CreateUserInterface,
   DeleteUserInterface,
@@ -41,6 +41,57 @@ export const UserService = {
     }
   },
 
+  syncUserRank: async (userId: string): Promise<void> => {
+    try {
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
+      if (!user) return;
+
+      const [{ animeCount }] = await db
+        .select({ animeCount: sql<number>`count(*)` })
+        .from(animes)
+        .where(eq(animes.createdByUserId, userId));
+
+      const [{ topicCount }] = await db
+        .select({ topicCount: sql<number>`count(*)` })
+        .from(topics)
+        .where(eq(topics.createdByUserId, userId));
+
+      const [{ commentCount }] = await db
+        .select({ commentCount: sql<number>`count(*)` })
+        .from(comments)
+        .where(eq(comments.createdByUserId, userId));
+
+      const hasAvatar = !!user.avatarUrl;
+      const hasAnime = Number(animeCount) > 0;
+      const hasTopic = Number(topicCount) > 0;
+      const hasComment = Number(commentCount) > 0;
+
+      let newRank: "S" | "A" | "B" | "C" | "D" = "D";
+
+      if (hasAvatar) {
+        newRank = "C";
+        if (hasAnime || hasTopic) {
+          newRank = "B";
+          if (hasComment) {
+            newRank = "A";
+            if (hasAnime && hasTopic) {
+              newRank = "S";
+            }
+          }
+        }
+      }
+
+      if (user.rank !== newRank) {
+        await db
+          .update(users)
+          .set({ rank: newRank })
+          .where(eq(users.id, userId));
+      }
+    } catch (error) {
+      console.error(`Erro ao sincronizar rank do usuário ${userId}:`, error);
+    }
+  },
+
   findAll: async ({
     page,
     limit,
@@ -54,6 +105,7 @@ export const UserService = {
           id: users.id,
           name: users.name,
           userName: users.userName,
+          rank: users.rank,
           avatarUrl: users.avatarUrl,
           createdAt: users.createdAt,
           updatedAt: users.updatedAt,
@@ -78,6 +130,7 @@ export const UserService = {
             id: users.id,
             name: users.name,
             userName: users.userName,
+            rank: users.rank,
             avatarUrl: users.avatarUrl,
             createdAt: users.createdAt,
             updatedAt: users.updatedAt,
@@ -244,6 +297,9 @@ export const UserService = {
           .update(users)
           .set({ avatarUrl, updatedAt: new Date() })
           .where(eq(users.id, targetId));
+
+        await UserService.syncUserRank(targetId);
+
         return {
           message: "Avatar atualizado com sucesso!",
           code: 200,

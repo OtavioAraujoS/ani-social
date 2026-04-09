@@ -10,6 +10,7 @@ import {
 import { SuccessResponseInterface } from "../../interfaces/Success";
 import { AuthService } from "../auth/auth.service";
 import { TopicsService } from "../topics/topics.service";
+import { UserService } from "../users/users.service";
 import xss from "xss";
 
 export const CommentsService = {
@@ -75,6 +76,7 @@ export const CommentsService = {
           createdByUserId: {
             userId: users.id,
             userName: users.userName,
+            rank: users.rank,
             avatarUrl: users.avatarUrl,
           },
         })
@@ -128,6 +130,9 @@ export const CommentsService = {
         .update(topics)
         .set({ comments: Number(count) })
         .where(eq(topics.id, topicId));
+
+      await UserService.syncUserRank(userLoggedId);
+
       return {
         message: "Comentário criado com sucesso!",
         success: true,

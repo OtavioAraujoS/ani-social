@@ -9,6 +9,7 @@ import {
 import { AnimeStatusEnum } from "../interfaces/Anime";
 
 export const roleEnum = pgEnum("role", ["USER", "ADMIN"]);
+export const userRankEnum = pgEnum("user_rank", ["S", "A", "B", "C", "D"]);
 export const animeStatusEnum = pgEnum("anime_status", [
   AnimeStatusEnum.COMPLETED,
   AnimeStatusEnum.RELEASING,
@@ -21,6 +22,7 @@ export const users = pgTable("users", {
   userName: text("user_name").notNull().unique(),
   password: text("password").notNull(),
   role: roleEnum("role").default("USER"),
+  rank: userRankEnum("rank").default("D").notNull(),
   avatarUrl: text("avatar_url"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

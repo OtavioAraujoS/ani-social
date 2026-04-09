@@ -43,6 +43,13 @@
       "when": 1774631733119,
       "tag": "0005_worried_impossible_man",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1775750864116,
+      "tag": "0006_minor_proemial_gods",
+      "breakpoints": true
     }
   ]
 }

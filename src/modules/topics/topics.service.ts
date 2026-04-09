@@ -61,11 +61,13 @@ export const TopicsService = {
           createdByUserId: {
             userId: users.id,
             userName: users.userName,
+            rank: users.rank,
             avatarUrl: users.avatarUrl,
           },
           updatedByUserId: {
             userId: updatedByUsers.id,
             userName: updatedByUsers.userName,
+            rank: updatedByUsers.rank,
             avatarUrl: updatedByUsers.avatarUrl,
           },
         })
@@ -123,11 +125,13 @@ export const TopicsService = {
           createdByUserId: {
             userId: users.id,
             userName: users.userName,
+            rank: users.rank,
             avatarUrl: users.avatarUrl,
           },
           updatedByUserId: {
             userId: updatedByUsers.id,
             userName: updatedByUsers.userName,
+            rank: updatedByUsers.rank,
             avatarUrl: updatedByUsers.avatarUrl,
           },
         })
@@ -190,6 +194,9 @@ export const TopicsService = {
         animeId,
         createdByUserId: userLoggedId,
       });
+
+      await UserService.syncUserRank(userLoggedId);
+
       return {
         message: "Tópico criado com sucesso!",
         success: true,

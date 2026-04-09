@@ -4,6 +4,13 @@ export const UserResponseSchema = t.Object({
   id: t.String(),
   name: t.String(),
   userName: t.String(),
+  rank: t.Union([
+    t.Literal("S"),
+    t.Literal("A"),
+    t.Literal("B"),
+    t.Literal("C"),
+    t.Literal("D"),
+  ]),
   avatarUrl: t.Union([t.String(), t.Null()]),
   createdAt: t.Date(),
   updatedAt: t.Date(),
@@ -39,6 +46,13 @@ export const DeleteUserSchema = t.Object({
 export const UserInfoSchema = t.Object({
   userId: t.String(),
   userName: t.String(),
+  rank: t.Union([
+    t.Literal("S"),
+    t.Literal("A"),
+    t.Literal("B"),
+    t.Literal("C"),
+    t.Literal("D"),
+  ]),
   avatarUrl: t.Nullable(t.String()),
 });
 

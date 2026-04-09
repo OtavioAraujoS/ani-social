@@ -75,11 +75,13 @@ export const AnimeService = {
           createdByUser: {
             userId: users.id,
             userName: users.userName,
+            rank: users.rank,
             avatarUrl: users.avatarUrl,
           },
           updatedByUser: {
             userId: updatedByUsers.id,
             userName: updatedByUsers.userName,
+            rank: updatedByUsers.rank,
             avatarUrl: updatedByUsers.avatarUrl,
           },
         })
@@ -147,6 +149,9 @@ export const AnimeService = {
           status,
           createdByUserId,
         });
+
+        await UserService.syncUserRank(createdByUserId);
+
         return {
           message: "Anime cadastrado com sucesso!",
           success: true,

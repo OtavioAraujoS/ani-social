@@ -9,6 +9,7 @@
     "db:push": "docker compose exec app bun x drizzle-kit push",
     "db:up": "docker compose up -d --build app && bun run db:migrate",
     "db:down": "docker compose down",
+    "db:migrate:prod": "bun x drizzle-kit migrate",
     "db:studio": "bun x drizzle-kit studio"
   },
   "dependencies": {

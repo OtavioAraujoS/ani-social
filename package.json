@@ -10,7 +10,9 @@
     "db:up": "docker compose up -d --build app && bun run db:migrate",
     "db:down": "docker compose down",
     "db:migrate:prod": "bun x drizzle-kit migrate",
-    "db:studio": "bun x drizzle-kit studio"
+    "db:studio": "bun x drizzle-kit studio",
+    "check:types": "tsc --noEmit",
+    "build": "bun build ./src/index.ts --outdir ./dist"
   },
   "dependencies": {
     "@elysiajs/cookie": "^0.8.0",
@@ -18,6 +20,7 @@
     "@elysiajs/jwt": "^1.4.1",
     "@elysiajs/swagger": "^1.3.1",
     "cloudinary": "^2.9.0",
+    "dotenv": "^16.4.5",
     "drizzle-kit": "^0.31.9",
     "drizzle-orm": "^0.45.1",
     "elysia": "latest",

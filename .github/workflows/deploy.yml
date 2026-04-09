@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -30,7 +30,7 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/3-criar-funcionalidade-de-cicd' || github.ref == 'refs/heads/1-implementar-sistema-de-ranking'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2

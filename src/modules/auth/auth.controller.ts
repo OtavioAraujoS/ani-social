@@ -26,6 +26,7 @@ export const authController = new Elysia({ prefix: "/auth" })
           userId: user.id,
           createdAt: user.createdAt.toISOString(),
           avatar: user.avatarUrl,
+          rank: user.rank,
         });
 
         return {

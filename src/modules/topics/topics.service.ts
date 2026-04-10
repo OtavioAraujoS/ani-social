@@ -59,13 +59,13 @@ export const TopicsService = {
             imageUrl: animes.imageUrl,
           },
           createdByUserId: {
-            userId: users.id,
+            name: users.name,
             userName: users.userName,
             rank: users.rank,
             avatarUrl: users.avatarUrl,
           },
           updatedByUserId: {
-            userId: updatedByUsers.id,
+            name: updatedByUsers.name,
             userName: updatedByUsers.userName,
             rank: updatedByUsers.rank,
             avatarUrl: updatedByUsers.avatarUrl,
@@ -79,11 +79,11 @@ export const TopicsService = {
         .offset((page - 1) * limit);
 
       return result.map((row) => {
-        const createdByUser = row.createdByUserId?.userId
+        const createdByUser = row.createdByUserId?.userName
           ? row.createdByUserId
           : null;
 
-        const updatedByUser = row.updatedByUserId?.userId
+        const updatedByUser = row.updatedByUserId?.userName
           ? row.updatedByUserId
           : null;
 
@@ -123,13 +123,13 @@ export const TopicsService = {
             imageUrl: animes.imageUrl,
           },
           createdByUserId: {
-            userId: users.id,
+            name: users.name,
             userName: users.userName,
             rank: users.rank,
             avatarUrl: users.avatarUrl,
           },
           updatedByUserId: {
-            userId: updatedByUsers.id,
+            name: updatedByUsers.name,
             userName: updatedByUsers.userName,
             rank: updatedByUsers.rank,
             avatarUrl: updatedByUsers.avatarUrl,
@@ -146,11 +146,11 @@ export const TopicsService = {
       }
 
       const row = result[0];
-      const createdByUser = row.createdByUserId?.userId
+      const createdByUser = row.createdByUserId?.userName
         ? row.createdByUserId
         : null;
 
-      const updatedByUser = row.updatedByUserId?.userId
+      const updatedByUser = row.updatedByUserId?.userName
         ? row.updatedByUserId
         : null;
 

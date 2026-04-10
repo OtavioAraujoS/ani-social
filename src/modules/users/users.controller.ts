@@ -13,25 +13,36 @@ import { adminMiddleware, authPlugin } from "../auth/auth.middleware";
 import { SuccessResponseSchema } from "../../interfaces/Success";
 import { PaginationQuerySchema } from "../../interfaces/Pagination";
 
-export const UserController = new Elysia({ prefix: "/users" })
+export const UserController = new Elysia()
+  .model({
+    CreateUser: CreateUserSchema,
+    UpdateUser: UpdateUserSchema,
+    UpdateUserPassword: UpdateUserPasswordSchema,
+    UpdateUserAvatar: UpdateUserAvatarSchema,
+    DeleteUser: DeleteUserSchema,
+    UserResponse: UserResponseSchema,
+    UserListResponse: UserListResponseSchema,
+    SuccessResponse: SuccessResponseSchema,
+    PaginationQuery: PaginationQuerySchema,
+  })
   .post("/", ({ body }) => UserService.create(body), {
-    body: CreateUserSchema,
-    response: SuccessResponseSchema,
+    body: "CreateUser",
+    response: "SuccessResponse",
   })
 
   .group("", (app) =>
     app
       .use(authPlugin)
       .get("/:userId", ({ params }) => UserService.findById(params.userId), {
-        response: UserResponseSchema,
+        response: "UserResponse",
       })
       .patch(
         "/",
         ({ body, user }) =>
           UserService.update({ ...body, userLoggedId: user!.sub }),
         {
-          body: UpdateUserSchema,
-          response: SuccessResponseSchema,
+          body: "UpdateUser",
+          response: "SuccessResponse",
         },
       )
       .patch(
@@ -39,8 +50,8 @@ export const UserController = new Elysia({ prefix: "/users" })
         ({ body, user }) =>
           UserService.updatePassword({ ...body, userLoggedId: user!.sub }),
         {
-          body: UpdateUserPasswordSchema,
-          response: SuccessResponseSchema,
+          body: "UpdateUserPassword",
+          response: "SuccessResponse",
         },
       )
       .patch(
@@ -48,25 +59,33 @@ export const UserController = new Elysia({ prefix: "/users" })
         ({ body, user }) =>
           UserService.updateUserAvatar({ ...body, userLoggedId: user!.sub }),
         {
-          body: UpdateUserAvatarSchema,
-          response: SuccessResponseSchema,
+          body: "UpdateUserAvatar",
+          response: "SuccessResponse",
         },
       ),
   )
   .group("/admin", (app) =>
     app
       .use(adminMiddleware)
-      .get("/", ({ query }) => UserService.findAll({ page: query.page ?? 1, limit: query.limit ?? 20 }), {
-        query: PaginationQuerySchema,
-        response: UserListResponseSchema,
-      })
+      .get(
+        "/",
+        ({ query }) =>
+          UserService.findAll({
+            page: query.page ?? 1,
+            limit: query.limit ?? 20,
+          }),
+        {
+          query: "PaginationQuery",
+          response: "UserListResponse",
+        },
+      )
       .delete(
         "/",
         ({ body, user }) =>
           UserService.delete({ ...body, userLoggedId: user!.sub }),
         {
-          body: DeleteUserSchema,
-          response: SuccessResponseSchema,
+          body: "DeleteUser",
+          response: "SuccessResponse",
         },
       ),
   );

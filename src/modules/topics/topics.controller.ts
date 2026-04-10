@@ -14,6 +14,14 @@ export const TopicController = new Elysia({ prefix: "/topics" }).group(
   "",
   (app) =>
     app
+      .model({
+        CreateTopic: CreateTopicSchema,
+        ListTopics: ListTopicsSchema,
+        TopicResponse: topicSchema,
+        UpdateTopic: UpdateTopicSchema,
+        SuccessResponse: SuccessResponseSchema,
+        PaginationQuery: PaginationQuerySchema,
+      })
       .get(
         "/",
         ({ query }) =>
@@ -22,8 +30,8 @@ export const TopicController = new Elysia({ prefix: "/topics" }).group(
             limit: query.limit ?? 20,
           }),
         {
-          query: PaginationQuerySchema,
-          response: ListTopicsSchema,
+          query: "PaginationQuery",
+          response: "ListTopics",
         },
       )
       .get(
@@ -33,7 +41,7 @@ export const TopicController = new Elysia({ prefix: "/topics" }).group(
           params: t.Object({
             topicId: t.String({ format: "uuid" }),
           }),
-          response: topicSchema,
+          response: "TopicResponse",
         },
       )
       .use(authPlugin)
@@ -42,8 +50,8 @@ export const TopicController = new Elysia({ prefix: "/topics" }).group(
         ({ body, user }) =>
           TopicsService.createTopic({ ...body, userLoggedId: user!.sub }),
         {
-          body: CreateTopicSchema,
-          response: SuccessResponseSchema,
+          body: "CreateTopic",
+          response: "SuccessResponse",
         },
       )
       .patch(
@@ -51,8 +59,8 @@ export const TopicController = new Elysia({ prefix: "/topics" }).group(
         ({ body, user }) =>
           TopicsService.updateTopic({ ...body, userLoggedId: user!.sub }),
         {
-          body: UpdateTopicSchema,
-          response: SuccessResponseSchema,
+          body: "UpdateTopic",
+          response: "SuccessResponse",
         },
       )
       .delete(
@@ -66,7 +74,7 @@ export const TopicController = new Elysia({ prefix: "/topics" }).group(
           params: t.Object({
             topicId: t.String({ format: "uuid" }),
           }),
-          response: SuccessResponseSchema,
+          response: "SuccessResponse",
         },
       ),
 );

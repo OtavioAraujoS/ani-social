@@ -1,6 +1,7 @@
 import Elysia, { t } from "elysia";
 import { jwt } from "@elysiajs/jwt";
 import { AuthService } from "./auth.service";
+import { LoginSchema, LoginResponseSchema } from "../../interfaces/Auth";
 
 const jwtSetup = jwt({
   name: "jwt",
@@ -8,9 +9,12 @@ const jwtSetup = jwt({
   exp: "1h",
 });
 
-export const authController = new Elysia({ prefix: "/auth" })
+export const authController = new Elysia()
   .use(jwtSetup)
-
+  .model({
+    Login: LoginSchema,
+    LoginResponse: LoginResponseSchema,
+  })
   .post(
     "/login",
     async ({ body, jwt, set }) => {
@@ -39,9 +43,12 @@ export const authController = new Elysia({ prefix: "/auth" })
       }
     },
     {
-      body: t.Object({
-        userName: t.String(),
-        password: t.String(),
-      }),
+      body: "Login",
+      response: {
+        200: "LoginResponse",
+        401: t.Object({
+          message: t.String(),
+        }),
+      },
     },
   );

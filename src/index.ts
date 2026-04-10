@@ -8,9 +8,15 @@ import { CommentsController } from "./modules/comments/comments.controller";
 import { DashboardController } from "./modules/dashboard/dashboard.controller";
 import { rateLimit } from "elysia-rate-limit";
 import { cors } from "@elysiajs/cors";
+import { PaginationQuerySchema } from "./interfaces/Pagination";
+import { SuccessResponseSchema } from "./interfaces/Success";
 
 const app = new Elysia()
   .use(cors())
+  .model({
+    PaginationQuery: PaginationQuerySchema,
+    SuccessResponse: SuccessResponseSchema,
+  })
   .onAfterHandle(({ set }) => {
     set.headers["X-Content-Type-Options"] = "nosniff";
     set.headers["X-Frame-Options"] = "DENY";
@@ -20,22 +26,19 @@ const app = new Elysia()
   .get("/", ({ redirect }) => {
     return redirect("/docs");
   })
-  .group("/api", (app) =>
-    app
-      .use(
-        rateLimit({
-          duration: 60000,
-          max: 100,
-          generator: (req) => req.headers.get("x-forwarded-for") || "localhost",
-        }),
-      )
-      .group("/authGroup", (app) => app.use(authController))
-      .group("/userGroup", (app) => app.use(UserController))
-      .group("/socialGroup", (app) =>
-        app.use(AnimeController).use(TopicController).use(CommentsController),
-      )
-      .group("/dashboardGroup", (app) => app.use(DashboardController)),
+  .use(
+    rateLimit({
+      duration: 60000,
+      max: 100,
+      generator: (req) => req.headers.get("x-forwarded-for") || "localhost",
+    }),
   )
+  .group("/auth", (app) => app.use(authController))
+  .group("/users", (app) => app.use(UserController))
+  .group("/social", (app) =>
+    app.use(AnimeController).use(TopicController).use(CommentsController),
+  )
+  .group("/dashboard", (app) => app.use(DashboardController))
   .listen(3333);
 
 console.log(

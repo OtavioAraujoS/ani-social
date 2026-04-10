@@ -1,7 +1,13 @@
-import { Elysia } from "elysia";
-import { authPlugin } from "../auth/auth.middleware";
 import { DashboardService } from "./dashboard.service";
+import { DashboardResponseSchema } from "../../interfaces/Dashboard";
+import { authPlugin } from "../auth/auth.middleware";
+import { Elysia } from "elysia";
 
-export const DashboardController = new Elysia({ prefix: "/dashboard" })
+export const DashboardController = new Elysia()
   .use(authPlugin)
-  .get("/", () => DashboardService.getDashboardData());
+  .model({
+    DashboardResponse: DashboardResponseSchema,
+  })
+  .get("/", () => DashboardService.getDashboardData(), {
+    response: "DashboardResponse",
+  });

@@ -5,6 +5,7 @@ import { authController } from "./modules/auth/auth.controller";
 import { AnimeController } from "./modules/animes/animes.controller";
 import { TopicController } from "./modules/topics/topics.controller";
 import { CommentsController } from "./modules/comments/comments.controller";
+import { DashboardController } from "./modules/dashboard/dashboard.controller";
 import { rateLimit } from "elysia-rate-limit";
 import { cors } from "@elysiajs/cors";
 
@@ -21,16 +22,19 @@ const app = new Elysia()
   })
   .group("/api", (app) =>
     app
-      .use(rateLimit({ 
-        duration: 60000, 
-        max: 100,
-        generator: (req) => req.headers.get("x-forwarded-for") || "localhost" 
-      }))
+      .use(
+        rateLimit({
+          duration: 60000,
+          max: 100,
+          generator: (req) => req.headers.get("x-forwarded-for") || "localhost",
+        }),
+      )
       .use(authController)
       .use(UserController)
       .use(AnimeController)
       .use(TopicController)
-      .use(CommentsController),
+      .use(CommentsController)
+      .use(DashboardController),
   )
   .listen(3333);
 

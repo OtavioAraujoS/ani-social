@@ -15,6 +15,15 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
   "",
   (app) =>
     app
+      .model({
+        AnimeListResponse: AnimeListResponseSchema,
+        AnimeDetailResponse: AnimeDetailResponseSchema,
+        CreateAnime: CreateAnimeSchema,
+        UpdateAnime: UpdateAnimeSchema,
+        UpdateAnimeImage: UpdateAnimeImageSchema,
+        SuccessResponse: SuccessResponseSchema,
+        PaginationQuery: PaginationQuerySchema,
+      })
       .get(
         "/",
         ({ query }) =>
@@ -23,15 +32,15 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
             limit: query.limit ?? 20,
           }),
         {
-          query: PaginationQuerySchema,
-          response: AnimeListResponseSchema,
+          query: "PaginationQuery",
+          response: "AnimeListResponse",
         },
       )
       .get("/:animeId", ({ params }) => AnimeService.findById(params.animeId), {
         params: t.Object({
           animeId: t.String({ format: "uuid" }),
         }),
-        response: AnimeDetailResponseSchema,
+        response: "AnimeDetailResponse",
       })
       .use(authPlugin)
       .post(
@@ -39,8 +48,8 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
         ({ body, user }) =>
           AnimeService.create({ ...body, createdByUserId: user!.sub }),
         {
-          body: CreateAnimeSchema,
-          response: SuccessResponseSchema,
+          body: "CreateAnime",
+          response: "SuccessResponse",
         },
       )
       .patch(
@@ -48,8 +57,8 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
         ({ body, user }) =>
           AnimeService.update({ ...body, updatedByUserId: user!.sub }),
         {
-          body: UpdateAnimeSchema,
-          response: SuccessResponseSchema,
+          body: "UpdateAnime",
+          response: "SuccessResponse",
         },
       )
       .patch(
@@ -60,8 +69,8 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
             updatedByUserId: user!.sub,
           }),
         {
-          body: UpdateAnimeImageSchema,
-          response: SuccessResponseSchema,
+          body: "UpdateAnimeImage",
+          response: "SuccessResponse",
         },
       )
       .delete(
@@ -72,7 +81,7 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
           params: t.Object({
             animeId: t.String({ format: "uuid" }),
           }),
-          response: SuccessResponseSchema,
+          response: "SuccessResponse",
         },
       ),
 );

@@ -14,16 +14,29 @@ export const CommentsController = new Elysia({ prefix: "/comments" }).group(
   "",
   (app) =>
     app
+      .model({
+        CommentList: CommentListSchema,
+        CreateComment: CreateCommentSchema,
+        UpdateComment: UpdateCommentSchema,
+        DeleteComment: DeleteCommentSchema,
+        SuccessResponse: SuccessResponseSchema,
+        PaginationQuery: PaginationQuerySchema,
+      })
       .use(authPlugin)
       .get(
         "/:topicId",
-        ({ params, query }) => CommentsService.getCommentsByTopicId({ topicId: params.topicId, page: query.page ?? 1, limit: query.limit ?? 20 }),
+        ({ params, query }) =>
+          CommentsService.getCommentsByTopicId({
+            topicId: params.topicId,
+            page: query.page ?? 1,
+            limit: query.limit ?? 20,
+          }),
         {
           params: t.Object({
             topicId: t.String({ format: "uuid" }),
           }),
-          query: PaginationQuerySchema,
-          response: CommentListSchema,
+          query: "PaginationQuery",
+          response: "CommentList",
         },
       )
       .post(
@@ -34,8 +47,8 @@ export const CommentsController = new Elysia({ prefix: "/comments" }).group(
             userLoggedId: user!.sub,
           }),
         {
-          body: CreateCommentSchema,
-          response: SuccessResponseSchema,
+          body: "CreateComment",
+          response: "SuccessResponse",
         },
       )
       .patch(
@@ -43,8 +56,8 @@ export const CommentsController = new Elysia({ prefix: "/comments" }).group(
         ({ body, user }) =>
           CommentsService.updateComment({ ...body, userLoggedId: user!.sub }),
         {
-          body: UpdateCommentSchema,
-          response: SuccessResponseSchema,
+          body: "UpdateComment",
+          response: "SuccessResponse",
         },
       )
       .delete(
@@ -52,8 +65,8 @@ export const CommentsController = new Elysia({ prefix: "/comments" }).group(
         ({ body, user }) =>
           CommentsService.deleteComment({ ...body, userLoggedId: user!.sub }),
         {
-          body: DeleteCommentSchema,
-          response: SuccessResponseSchema,
+          body: "DeleteComment",
+          response: "SuccessResponse",
         },
       ),
 );

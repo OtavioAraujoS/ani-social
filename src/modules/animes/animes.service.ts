@@ -54,7 +54,18 @@ export const AnimeService = {
   }): Promise<AnimeListResponseInterface> => {
     try {
       return await db
-        .select()
+        .select({
+          id: animes.id,
+          title: animes.title,
+          description: animes.description,
+          episodes: animes.episodes,
+          review: animes.review,
+          stars: animes.stars,
+          imageUrl: animes.imageUrl,
+          status: animes.status,
+          createdAt: animes.createdAt,
+          updatedAt: animes.updatedAt,
+        })
         .from(animes)
         .limit(limit)
         .offset((page - 1) * limit);
@@ -73,13 +84,13 @@ export const AnimeService = {
         .select({
           anime: animes,
           createdByUser: {
-            userId: users.id,
+            name: users.name,
             userName: users.userName,
             rank: users.rank,
             avatarUrl: users.avatarUrl,
           },
           updatedByUser: {
-            userId: updatedByUsers.id,
+            name: updatedByUsers.name,
             userName: updatedByUsers.userName,
             rank: updatedByUsers.rank,
             avatarUrl: updatedByUsers.avatarUrl,
@@ -94,11 +105,11 @@ export const AnimeService = {
 
       const { createdByUserId, updatedByUserId, ...animeData } = result.anime;
 
-      const createdByUser = result.createdByUser?.userId
+      const createdByUser = result.createdByUser?.userName
         ? result.createdByUser
         : null;
 
-      const updatedByUser = result.updatedByUser?.userId
+      const updatedByUser = result.updatedByUser?.userName
         ? result.updatedByUser
         : null;
 

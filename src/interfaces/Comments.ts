@@ -6,8 +6,8 @@ export const CommentSchema = t.Object({
   content: t.String(),
   topicId: t.String(),
   createdByUserId: t.Nullable(UserInfoSchema),
-  createdAt: t.String(),
-  updatedAt: t.String(),
+  createdAt: t.Date(),
+  updatedAt: t.Date(),
 });
 
 export const CommentListSchema = t.Array(CommentSchema);

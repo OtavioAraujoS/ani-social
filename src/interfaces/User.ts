@@ -44,7 +44,7 @@ export const DeleteUserSchema = t.Object({
 });
 
 export const UserInfoSchema = t.Object({
-  userId: t.String(),
+  name: t.String(),
   userName: t.String(),
   rank: t.Union([
     t.Literal("S"),

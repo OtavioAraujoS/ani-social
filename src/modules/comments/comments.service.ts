@@ -74,7 +74,7 @@ export const CommentsService = {
         .select({
           comment: comments,
           createdByUserId: {
-            userId: users.id,
+            name: users.name,
             userName: users.userName,
             rank: users.rank,
             avatarUrl: users.avatarUrl,
@@ -87,17 +87,15 @@ export const CommentsService = {
         .offset((page - 1) * limit);
 
       return result.map((row) => {
-        const createdByUser = row.createdByUserId?.userId
+        const createdByUser = row.createdByUserId?.userName
           ? row.createdByUserId
           : null;
 
+        const { createdByUserId, ...restComment } = row.comment;
+
         return {
-          id: row.comment.id,
-          content: row.comment.content,
-          topicId: row.comment.topicId,
+          ...restComment,
           createdByUserId: createdByUser as any,
-          createdAt: row.comment.createdAt.toISOString(),
-          updatedAt: row.comment.updatedAt.toISOString(),
         };
       });
     } catch (error) {

@@ -29,12 +29,12 @@ const app = new Elysia()
           generator: (req) => req.headers.get("x-forwarded-for") || "localhost",
         }),
       )
-      .use(authController)
-      .use(UserController)
-      .use(AnimeController)
-      .use(TopicController)
-      .use(CommentsController)
-      .use(DashboardController),
+      .group("/authGroup", (app) => app.use(authController))
+      .group("/userGroup", (app) => app.use(UserController))
+      .group("/socialGroup", (app) =>
+        app.use(AnimeController).use(TopicController).use(CommentsController),
+      )
+      .group("/dashboardGroup", (app) => app.use(DashboardController)),
   )
   .listen(3333);
 

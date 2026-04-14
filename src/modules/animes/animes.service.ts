@@ -7,7 +7,7 @@ import {
 } from "../../interfaces/Anime";
 import { db } from "../../db";
 import { animes, users } from "../../db/schema";
-import { eq, aliasedTable } from "drizzle-orm";
+import { eq, aliasedTable, ilike, and, count } from "drizzle-orm";
 import { SuccessResponseInterface } from "../../interfaces/Success";
 import { uploadImage } from "../../lib/cloudinary";
 import { AuthService } from "../auth/auth.service";
@@ -49,13 +49,26 @@ export const AnimeService = {
     page,
     limit,
     userId,
+    title,
   }: {
     page: number;
     limit: number;
     userId?: string;
-  }): Promise<AnimeListResponseInterface> => {
+    title?: string;
+  }): Promise<{ data: any[]; total: number }> => {
     try {
-      const baseQuery = db
+      const filters = [];
+
+      if (userId) {
+        filters.push(eq(animes.createdByUserId, userId));
+      }
+
+      if (title) {
+        filters.push(ilike(animes.title, `%${title}%`));
+      }
+
+      const whereClause = filters.length > 0 ? and(...filters) : undefined;
+      const dataPromise = db
         .select({
           id: animes.id,
           title: animes.title,
@@ -68,13 +81,25 @@ export const AnimeService = {
           createdAt: animes.createdAt,
           updatedAt: animes.updatedAt,
         })
-        .from(animes);
+        .from(animes)
+        .where(whereClause)
+        .limit(limit)
+        .offset((page - 1) * limit);
 
-      const filteredQuery = userId
-        ? baseQuery.where(eq(animes.createdByUserId, userId))
-        : baseQuery;
+      const countPromise = db
+        .select({ total: count() })
+        .from(animes)
+        .where(whereClause);
 
-      return await filteredQuery.limit(limit).offset((page - 1) * limit);
+      const [data, countResult] = await Promise.all([
+        dataPromise,
+        countPromise,
+      ]);
+
+      return {
+        data,
+        total: countResult[0].total,
+      };
     } catch (error) {
       throw new Error("Não foi possível verificar os animes - " + error, {
         cause: error,

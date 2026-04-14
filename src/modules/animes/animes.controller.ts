@@ -29,12 +29,14 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
             page: query.page ?? 1,
             limit: query.limit ?? 20,
             userId: query.userId,
+            title: query.title,
           }),
         {
           query: t.Object({
             page: t.Optional(t.Number()),
             limit: t.Optional(t.Number()),
             userId: t.Optional(t.String({ format: "uuid" })),
+            title: t.Optional(t.String()),
           }),
           response: "AnimeListResponse",
         },

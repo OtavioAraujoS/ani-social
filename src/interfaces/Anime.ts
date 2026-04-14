@@ -26,7 +26,10 @@ export const AnimeSchemaOnTopic = t.Object({
   imageUrl: t.Nullable(t.String()),
 });
 
-export const AnimeListResponseSchema = t.Array(AnimeSchema);
+export const AnimeListResponseSchema = t.Object({
+  data: t.Array(AnimeSchema),
+  total: t.Number(),
+});
 
 export const CreateAnimeSchema = t.Object({
   title: t.String(),

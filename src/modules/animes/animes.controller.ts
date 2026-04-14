@@ -9,7 +9,6 @@ import {
   UpdateAnimeSchema,
 } from "../../interfaces/Anime";
 import { SuccessResponseSchema } from "../../interfaces/Success";
-import { PaginationQuerySchema } from "../../interfaces/Pagination";
 
 export const AnimeController = new Elysia({ prefix: "/animes" }).group(
   "",
@@ -22,7 +21,6 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
         UpdateAnime: UpdateAnimeSchema,
         UpdateAnimeImage: UpdateAnimeImageSchema,
         SuccessResponse: SuccessResponseSchema,
-        PaginationQuery: PaginationQuerySchema,
       })
       .get(
         "/",
@@ -30,9 +28,14 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
           AnimeService.findAll({
             page: query.page ?? 1,
             limit: query.limit ?? 20,
+            userId: query.userId,
           }),
         {
-          query: "PaginationQuery",
+          query: t.Object({
+            page: t.Optional(t.Number()),
+            limit: t.Optional(t.Number()),
+            userId: t.Optional(t.String({ format: "uuid" })),
+          }),
           response: "AnimeListResponse",
         },
       )

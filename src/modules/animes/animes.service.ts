@@ -48,12 +48,14 @@ export const AnimeService = {
   findAll: async ({
     page,
     limit,
+    userId,
   }: {
     page: number;
     limit: number;
+    userId?: string;
   }): Promise<AnimeListResponseInterface> => {
     try {
-      return await db
+      const baseQuery = db
         .select({
           id: animes.id,
           title: animes.title,
@@ -66,9 +68,13 @@ export const AnimeService = {
           createdAt: animes.createdAt,
           updatedAt: animes.updatedAt,
         })
-        .from(animes)
-        .limit(limit)
-        .offset((page - 1) * limit);
+        .from(animes);
+
+      const filteredQuery = userId
+        ? baseQuery.where(eq(animes.createdByUserId, userId))
+        : baseQuery;
+
+      return await filteredQuery.limit(limit).offset((page - 1) * limit);
     } catch (error) {
       throw new Error("Não foi possível verificar os animes - " + error, {
         cause: error,

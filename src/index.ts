@@ -22,6 +22,28 @@ const app = new Elysia()
     set.headers["X-Frame-Options"] = "DENY";
     set.headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
   })
+  .onError(({ code, error, set }) => {
+    if (code === "VALIDATION") {
+      set.status = 422;
+
+      return {
+        type: "validation",
+        errors: error.all.map((e) => ({
+          path: e.path,
+          message: e.message,
+          value: e.value,
+        })),
+      };
+    }
+
+    if (error instanceof Error) {
+      set.status = 400;
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  })
   .use(swagger({ path: "/docs" }))
   .get("/", ({ redirect }) => {
     return redirect("/docs");

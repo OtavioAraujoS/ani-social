@@ -1,5 +1,4 @@
 import {
-  AnimeListResponseInterface,
   AnimeDetailResponseInterface,
   CreateAnimeInterface,
   UpdateAnimeImageInterface,
@@ -148,7 +147,9 @@ export const AnimeService = {
       };
     } catch (error) {
       if (error instanceof Error) throw error;
-      throw new Error("Não foi possível verificar o anime informado", { cause: error });
+      throw new Error("Não foi possível verificar o anime informado", {
+        cause: error,
+      });
     }
   },
 
@@ -284,7 +285,9 @@ export const AnimeService = {
       throw new Error("Anime não encontrado");
     } catch (error) {
       if (error instanceof Error) throw error;
-      throw new Error("Não foi possível atualizar a imagem do anime", { cause: error });
+      throw new Error("Não foi possível atualizar a imagem do anime", {
+        cause: error,
+      });
     }
   },
 

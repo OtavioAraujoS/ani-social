@@ -24,9 +24,8 @@ export const AnimeService = {
       if (!anime) return false;
       return true;
     } catch (error) {
-      throw new Error("Não foi possível verificar os animes - " + error, {
-        cause: error,
-      });
+      if (error instanceof Error) throw error;
+      throw new Error("Não foi possível verificar os animes", { cause: error });
     }
   },
 
@@ -39,9 +38,8 @@ export const AnimeService = {
       if (existingAnime) return true;
       return false;
     } catch (error) {
-      throw new Error("Não foi possível verificar os animes - " + error, {
-        cause: error,
-      });
+      if (error instanceof Error) throw error;
+      throw new Error("Não foi possível verificar os animes", { cause: error });
     }
   },
 
@@ -101,9 +99,8 @@ export const AnimeService = {
         total: countResult[0].total,
       };
     } catch (error) {
-      throw new Error("Não foi possível verificar os animes - " + error, {
-        cause: error,
-      });
+      if (error instanceof Error) throw error;
+      throw new Error("Não foi possível verificar os animes", { cause: error });
     }
   },
 
@@ -150,12 +147,8 @@ export const AnimeService = {
         updatedByUser: updatedByUser as any,
       };
     } catch (error) {
-      throw new Error(
-        "Não foi possível verificar o anime informado - " + error,
-        {
-          cause: error,
-        },
-      );
+      if (error instanceof Error) throw error;
+      throw new Error("Não foi possível verificar o anime informado", { cause: error });
     }
   },
 
@@ -202,9 +195,8 @@ export const AnimeService = {
       }
       throw new Error("Anime já cadastrado");
     } catch (error) {
-      throw new Error("Não foi possível cadastrar o anime - " + error, {
-        cause: error,
-      });
+      if (error instanceof Error) throw error;
+      throw new Error("Não foi possível cadastrar o anime", { cause: error });
     }
   },
 
@@ -252,9 +244,8 @@ export const AnimeService = {
       }
       throw new Error("Anime não encontrado");
     } catch (error) {
-      throw new Error("Não foi possível atualizar o anime - " + error, {
-        cause: error,
-      });
+      if (error instanceof Error) throw error;
+      throw new Error("Não foi possível atualizar o anime", { cause: error });
     }
   },
 
@@ -292,12 +283,8 @@ export const AnimeService = {
       }
       throw new Error("Anime não encontrado");
     } catch (error) {
-      throw new Error(
-        "Não foi possível atualizar a imagem do anime - " + error,
-        {
-          cause: error,
-        },
-      );
+      if (error instanceof Error) throw error;
+      throw new Error("Não foi possível atualizar a imagem do anime", { cause: error });
     }
   },
 
@@ -326,9 +313,8 @@ export const AnimeService = {
       }
       throw new Error("Anime não encontrado");
     } catch (error) {
-      throw new Error("Não foi possível deletar o anime - " + error, {
-        cause: error,
-      });
+      if (error instanceof Error) throw error;
+      throw new Error("Não foi possível deletar o anime", { cause: error });
     }
   },
 };

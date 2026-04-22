@@ -1,4 +1,4 @@
-import { desc, eq, aliasedTable } from "drizzle-orm";
+import { desc, eq, aliasedTable, sql, getTableColumns } from "drizzle-orm";
 import { db } from "../../db";
 import { animes, topics, users } from "../../db/schema";
 import { AnimeStatusEnum } from "../../interfaces/Anime";
@@ -69,9 +69,31 @@ export const DashboardService = {
       };
     });
 
+    const releasingAnimesSubquery = db
+      .select({
+        ...getTableColumns(animes),
+        rn: sql<number>`row_number() over (partition by ${animes.createdByUserId} order by ${animes.updatedAt} desc)`.as(
+          "rn",
+        ),
+      })
+      .from(animes)
+      .where(eq(animes.status, AnimeStatusEnum.RELEASING))
+      .as("releasing_sq");
+
     const releasingAnimesFetch = await db
       .select({
-        anime: animes,
+        anime: {
+          id: releasingAnimesSubquery.id,
+          title: releasingAnimesSubquery.title,
+          description: releasingAnimesSubquery.description,
+          episodes: releasingAnimesSubquery.episodes,
+          review: releasingAnimesSubquery.review,
+          stars: releasingAnimesSubquery.stars,
+          imageUrl: releasingAnimesSubquery.imageUrl,
+          status: releasingAnimesSubquery.status,
+          createdAt: releasingAnimesSubquery.createdAt,
+          updatedAt: releasingAnimesSubquery.updatedAt,
+        },
         createdByUser: {
           name: users.name,
           userName: users.userName,
@@ -85,17 +107,19 @@ export const DashboardService = {
           avatarUrl: updatedByUsers.avatarUrl,
         },
       })
-      .from(animes)
-      .leftJoin(users, eq(animes.createdByUserId, users.id))
-      .leftJoin(updatedByUsers, eq(animes.updatedByUserId, updatedByUsers.id))
-      .where(eq(animes.status, AnimeStatusEnum.RELEASING))
-      .orderBy(desc(animes.updatedAt))
+      .from(releasingAnimesSubquery)
+      .leftJoin(users, eq(releasingAnimesSubquery.createdByUserId, users.id))
+      .leftJoin(
+        updatedByUsers,
+        eq(releasingAnimesSubquery.updatedByUserId, updatedByUsers.id),
+      )
+      .where(eq(releasingAnimesSubquery.rn, 1))
+      .orderBy(desc(releasingAnimesSubquery.updatedAt))
       .limit(5);
 
     const releasingAnimes = releasingAnimesFetch.map((row) => {
-      const { createdByUserId, updatedByUserId, ...animeData } = row.anime;
       return {
-        ...animeData,
+        ...row.anime,
         createdByUser: row.createdByUser,
         updatedByUser: row.updatedByUser,
       };

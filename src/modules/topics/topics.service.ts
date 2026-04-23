@@ -1,4 +1,4 @@
-import { eq, aliasedTable } from "drizzle-orm";
+import { eq, aliasedTable, and, ilike } from "drizzle-orm";
 import { topics, animes, users, comments } from "../../db/schema";
 import { db } from "../../db";
 import {
@@ -13,6 +13,7 @@ import { AuthService } from "../auth/auth.service";
 import xss from "xss";
 import { UserService } from "../users/users.service";
 import { AnimeService } from "../animes/animes.service";
+import { AnimeStatusEnum } from "../../interfaces/Anime";
 
 export const TopicsService = {
   verifyTopicExist: async (topicId: string): Promise<boolean> => {
@@ -43,11 +44,39 @@ export const TopicsService = {
   getAllTopics: async ({
     page,
     limit,
+    title,
+    status,
+    animeId,
+    userId,
   }: {
     page: number;
     limit: number;
+    title?: string;
+    status?: AnimeStatusEnum;
+    animeId?: string;
+    userId?: string;
   }): Promise<ListTopicsResponseInterface> => {
     try {
+      const filters = [];
+
+      if (title) {
+        filters.push(ilike(topics.title, `%${title}%`));
+      }
+
+      if (status) {
+        filters.push(eq(animes.status, status));
+      }
+
+      if (animeId) {
+        filters.push(eq(topics.animeId, animeId));
+      }
+
+      if (userId) {
+        filters.push(eq(topics.createdByUserId, userId));
+      }
+
+      const whereClause = filters.length > 0 ? and(...filters) : undefined;
+
       const updatedByUsers = aliasedTable(users, "updatedByUsers");
 
       const result = await db
@@ -75,6 +104,7 @@ export const TopicsService = {
         .leftJoin(animes, eq(topics.animeId, animes.id))
         .leftJoin(users, eq(topics.createdByUserId, users.id))
         .leftJoin(updatedByUsers, eq(topics.updatedByUserId, updatedByUsers.id))
+        .where(whereClause)
         .limit(limit)
         .offset((page - 1) * limit);
 

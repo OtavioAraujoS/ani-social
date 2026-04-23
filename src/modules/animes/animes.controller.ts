@@ -4,6 +4,7 @@ import { AnimeService } from "./animes.service";
 import {
   AnimeListResponseSchema,
   AnimeDetailResponseSchema,
+  AnimeStatusEnum,
   CreateAnimeSchema,
   UpdateAnimeImageSchema,
   UpdateAnimeSchema,
@@ -30,6 +31,7 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
             limit: query.limit ?? 20,
             userId: query.userId,
             title: query.title,
+            status: query.status,
           }),
         {
           query: t.Object({
@@ -37,6 +39,7 @@ export const AnimeController = new Elysia({ prefix: "/animes" }).group(
             limit: t.Optional(t.Number()),
             userId: t.Optional(t.String({ format: "uuid" })),
             title: t.Optional(t.String()),
+            status: t.Optional(t.Enum(AnimeStatusEnum)),
           }),
           response: "AnimeListResponse",
         },

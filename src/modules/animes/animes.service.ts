@@ -1,5 +1,6 @@
 import {
   AnimeDetailResponseInterface,
+  AnimeStatusEnum,
   CreateAnimeInterface,
   UpdateAnimeImageInterface,
   UpdateAnimeInterface,
@@ -47,11 +48,13 @@ export const AnimeService = {
     limit,
     userId,
     title,
+    status,
   }: {
     page: number;
     limit: number;
     userId?: string;
     title?: string;
+    status?: AnimeStatusEnum;
   }): Promise<{ data: any[]; total: number }> => {
     try {
       const filters = [];
@@ -62,6 +65,10 @@ export const AnimeService = {
 
       if (title) {
         filters.push(ilike(animes.title, `%${title}%`));
+      }
+
+      if (status) {
+        filters.push(eq(animes.status, status));
       }
 
       const whereClause = filters.length > 0 ? and(...filters) : undefined;

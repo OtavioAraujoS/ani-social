@@ -1,4 +1,4 @@
-import { eq, aliasedTable, and, ilike } from "drizzle-orm";
+import { eq, aliasedTable, and, ilike, desc } from "drizzle-orm";
 import { topics, animes, users, comments } from "../../db/schema";
 import { db } from "../../db";
 import {
@@ -7,13 +7,13 @@ import {
   TopicResponseInterface,
   UpdateTopicInterface,
   DeleteTopicInterface,
+  TopicStatusEnum,
 } from "../../interfaces/Topic";
 import { SuccessResponseInterface } from "../../interfaces/Success";
 import { AuthService } from "../auth/auth.service";
 import xss from "xss";
 import { UserService } from "../users/users.service";
 import { AnimeService } from "../animes/animes.service";
-import { AnimeStatusEnum } from "../../interfaces/Anime";
 
 export const TopicsService = {
   verifyTopicExist: async (topicId: string): Promise<boolean> => {
@@ -52,7 +52,7 @@ export const TopicsService = {
     page: number;
     limit: number;
     title?: string;
-    status?: AnimeStatusEnum;
+    status?: TopicStatusEnum;
     animeId?: string;
     userId?: string;
   }): Promise<ListTopicsResponseInterface> => {
@@ -63,8 +63,8 @@ export const TopicsService = {
         filters.push(ilike(topics.title, `%${title}%`));
       }
 
-      if (status) {
-        filters.push(eq(animes.status, status));
+      if (status === TopicStatusEnum.NO_COMMENTS) {
+        filters.push(eq(topics.comments, 0));
       }
 
       if (animeId) {
@@ -76,6 +76,12 @@ export const TopicsService = {
       }
 
       const whereClause = filters.length > 0 ? and(...filters) : undefined;
+
+      let orderByClause = desc(topics.createdAt);
+
+      if (status === TopicStatusEnum.POPULAR) {
+        orderByClause = desc(topics.comments);
+      }
 
       const updatedByUsers = aliasedTable(users, "updatedByUsers");
 
@@ -105,6 +111,7 @@ export const TopicsService = {
         .leftJoin(users, eq(topics.createdByUserId, users.id))
         .leftJoin(updatedByUsers, eq(topics.updatedByUserId, updatedByUsers.id))
         .where(whereClause)
+        .orderBy(orderByClause)
         .limit(limit)
         .offset((page - 1) * limit);
 
@@ -128,6 +135,7 @@ export const TopicsService = {
         };
       });
     } catch (error) {
+      if (error instanceof Error) throw error;
       throw new Error("Não foi possível listar os tópicos - " + error, {
         cause: error,
       });
@@ -194,6 +202,7 @@ export const TopicsService = {
         updatedByUserId: updatedByUser,
       };
     } catch (error) {
+      if (error instanceof Error) throw error;
       throw new Error("Não foi possível encontrar o tópico - " + error, {
         cause: error,
       });
@@ -233,6 +242,7 @@ export const TopicsService = {
         code: 201,
       };
     } catch (error) {
+      if (error instanceof Error) throw error;
       throw new Error("Não foi possível criar o tópico - " + error, {
         cause: error,
       });
@@ -282,6 +292,7 @@ export const TopicsService = {
         code: 200,
       };
     } catch (error) {
+      if (error instanceof Error) throw error;
       throw new Error("Não foi possível atualizar o tópico - " + error, {
         cause: error,
       });
@@ -317,6 +328,7 @@ export const TopicsService = {
         code: 200,
       };
     } catch (error) {
+      if (error instanceof Error) throw error;
       throw new Error("Não foi possível deletar o tópico - " + error, {
         cause: error,
       });

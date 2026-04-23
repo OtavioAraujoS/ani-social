@@ -1,5 +1,4 @@
 import Elysia, { t } from "elysia";
-import { AnimeStatusEnum } from "../../interfaces/Anime";
 import { authPlugin } from "../auth/auth.middleware";
 import { TopicsService } from "./topics.service";
 import {
@@ -7,6 +6,7 @@ import {
   ListTopicsSchema,
   topicSchema,
   UpdateTopicSchema,
+  TopicStatusEnum,
 } from "../../interfaces/Topic";
 import { SuccessResponseSchema } from "../../interfaces/Success";
 import { PaginationQuerySchema } from "../../interfaces/Pagination";
@@ -39,7 +39,7 @@ export const TopicController = new Elysia({ prefix: "/topics" }).group(
             page: t.Optional(t.Numeric({ default: 1 })),
             limit: t.Optional(t.Numeric({ default: 20 })),
             title: t.Optional(t.String()),
-            status: t.Optional(t.Enum(AnimeStatusEnum)),
+            status: t.Optional(t.Enum(TopicStatusEnum)),
             animeId: t.Optional(t.String({ format: "uuid" })),
             userId: t.Optional(t.String({ format: "uuid" })),
           }),

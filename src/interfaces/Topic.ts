@@ -2,6 +2,12 @@ import { t } from "elysia";
 import { AnimeSchemaOnTopic } from "./Anime";
 import { UserInfoSchema } from "./User";
 
+export enum TopicStatusEnum {
+  LATEST = "LATEST",
+  POPULAR = "POPULAR",
+  NO_COMMENTS = "NO_COMMENTS",
+}
+
 export const topicSchema = t.Object({
   id: t.String(),
   title: t.String(),

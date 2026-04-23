@@ -20,7 +20,10 @@ export const topicSchema = t.Object({
   comments: t.Number(),
 });
 
-export const ListTopicsSchema = t.Array(topicSchema);
+export const ListTopicsSchema = t.Object({
+  data: t.Array(topicSchema),
+  total: t.Number(),
+});
 
 export const CreateTopicSchema = t.Object({
   title: t.String(),

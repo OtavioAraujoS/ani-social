@@ -1,4 +1,4 @@
-import { eq, aliasedTable, and, ilike, desc } from "drizzle-orm";
+import { eq, aliasedTable, and, ilike, desc, count } from "drizzle-orm";
 import { topics, animes, users, comments } from "../../db/schema";
 import { db } from "../../db";
 import {
@@ -115,25 +115,30 @@ export const TopicsService = {
         .limit(limit)
         .offset((page - 1) * limit);
 
-      return result.map((row) => {
-        const createdByUser = row.createdByUserId?.userName
-          ? row.createdByUserId
-          : null;
+      return {
+        data: result.map((row) => {
+          const createdByUser = row.createdByUserId?.userName
+            ? row.createdByUserId
+            : null;
 
-        const updatedByUser = row.updatedByUserId?.userName
-          ? row.updatedByUserId
-          : null;
+          const updatedByUser = row.updatedByUserId?.userName
+            ? row.updatedByUserId
+            : null;
 
-        const { animeId, createdByUserId, updatedByUserId, ...restTopic } =
-          row.topic;
+          const { animeId, createdByUserId, updatedByUserId, ...restTopic } =
+            row.topic;
 
-        return {
-          ...restTopic,
-          animeInfos: row.animeInfos!,
-          createdByUserId: createdByUser,
-          updatedByUserId: updatedByUser,
-        };
-      });
+          return {
+            ...restTopic,
+            animeInfos: row.animeInfos!,
+            createdByUserId: createdByUser,
+            updatedByUserId: updatedByUser,
+          };
+        }),
+        total: (
+          await db.select({ total: count() }).from(topics).where(whereClause)
+        )[0].total,
+      };
     } catch (error) {
       if (error instanceof Error) throw error;
       throw new Error("Não foi possível listar os tópicos - " + error, {

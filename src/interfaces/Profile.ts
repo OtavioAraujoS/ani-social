@@ -31,10 +31,21 @@ const CommentSchema = t.Object({
 
 export const UserProfileCommentsListResponseSchema = t.Array(CommentSchema);
 
+export const UserProfileInfosResponseSchema = t.Object({
+  id: t.String(),
+  username: t.String(),
+  name: t.String(),
+  avatarUrl: t.Nullable(t.String()),
+});
+
+export type UserProfileInfosResponseInterface =
+  typeof UserProfileInfosResponseSchema.static;
+
 export const UserProfileResponseSchema = t.Object({
   anime: UserProfileAnimesListResponseSchema,
   topics: UserProfileTopicsListResponseSchema,
   comments: UserProfileCommentsListResponseSchema,
+  userInfos: UserProfileInfosResponseSchema,
 });
 
 export type UserProfileAnimesListResponseInterface =

@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import {
   UserProfileAnimesListResponseInterface,
   UserProfileCommentsListResponseInterface,
+  UserProfileInfosResponseInterface,
   UserProfileResponseInterface,
   UserProfileTopicsListResponseInterface,
 } from "../../interfaces/Profile";
@@ -79,22 +80,44 @@ export const ProfileService = {
     }
   },
 
+  findUserInfos: async (
+    userId: string,
+  ): Promise<UserProfileInfosResponseInterface> => {
+    try {
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
+      if (!user) throw new Error("Usuário não encontrado.");
+
+      return {
+        id: user.id,
+        username: user.name,
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+      };
+    } catch (error) {
+      if (error instanceof Error) throw error;
+      throw new Error("Erro ao buscar perfil", { cause: error });
+    }
+  },
+
   findUserProfile: async (
     userId: string,
   ): Promise<UserProfileResponseInterface> => {
     try {
       if (!userId) throw new Error("Usuário não informado.");
 
-      const [animeList, topicsList, commentsList] = await Promise.all([
-        ProfileService.findUserAnimes(userId),
-        ProfileService.findTopicsByUser(userId),
-        ProfileService.findCommentsByUser(userId),
-      ]);
+      const [animeList, topicsList, commentsList, userInfos] =
+        await Promise.all([
+          ProfileService.findUserAnimes(userId),
+          ProfileService.findTopicsByUser(userId),
+          ProfileService.findCommentsByUser(userId),
+          ProfileService.findUserInfos(userId),
+        ]);
 
       return {
         anime: animeList || [],
         topics: topicsList || [],
         comments: commentsList || [],
+        userInfos: userInfos || {},
       };
     } catch (error) {
       if (error instanceof Error) throw error;

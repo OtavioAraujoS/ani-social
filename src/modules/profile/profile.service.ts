@@ -49,6 +49,7 @@ export const ProfileService = {
           content: topics.description,
           createdAt: topics.createdAt,
           updatedAt: topics.updatedAt,
+          comments: topics.comments,
         })
         .from(topics)
         .where(eq(topics.createdByUserId, userId));

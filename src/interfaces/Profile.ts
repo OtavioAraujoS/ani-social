@@ -36,6 +36,7 @@ export const UserProfileInfosResponseSchema = t.Object({
   username: t.String(),
   name: t.String(),
   avatarUrl: t.Nullable(t.String()),
+  rank: t.String(),
 });
 
 export type UserProfileInfosResponseInterface =

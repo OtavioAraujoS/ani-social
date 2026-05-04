@@ -93,6 +93,7 @@ export const ProfileService = {
         username: user.userName,
         name: user.name,
         avatarUrl: user.avatarUrl,
+        rank: user.rank,
       };
     } catch (error) {
       if (error instanceof Error) throw error;

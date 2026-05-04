@@ -10,6 +10,7 @@ import { rateLimit } from "elysia-rate-limit";
 import { cors } from "@elysiajs/cors";
 import { PaginationQuerySchema } from "./interfaces/Pagination";
 import { SuccessResponseSchema } from "./interfaces/Success";
+import { ProfileController } from "./modules/profile/profile.controller";
 
 const app = new Elysia()
   .use(cors())
@@ -57,10 +58,11 @@ const app = new Elysia()
   )
   .group("/auth", (app) => app.use(authController))
   .group("/users", (app) => app.use(UserController))
-  .group("/social", (app) =>
-    app.use(AnimeController).use(TopicController).use(CommentsController),
-  )
   .group("/dashboard", (app) => app.use(DashboardController))
+  .group("animes", (app) => app.use(AnimeController))
+  .group("topics", (app) => app.use(TopicController))
+  .group("comments", (app) => app.use(CommentsController))
+  .group("/profile", (app) => app.use(ProfileController))
   .listen(3333);
 
 console.log(

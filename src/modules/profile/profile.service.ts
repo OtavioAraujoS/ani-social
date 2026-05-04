@@ -90,7 +90,7 @@ export const ProfileService = {
 
       return {
         id: user.id,
-        username: user.name,
+        username: user.userName,
         name: user.name,
         avatarUrl: user.avatarUrl,
       };

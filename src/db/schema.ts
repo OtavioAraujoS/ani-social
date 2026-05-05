@@ -36,8 +36,12 @@ export const animes = pgTable("animes", {
   review: text("review"),
   stars: integer("stars"),
   imageUrl: text("image_url"),
-  createdByUserId: uuid("created_by_user_id").notNull(),
-  updatedByUserId: uuid("updated_by_user_id"),
+  createdByUserId: uuid("created_by_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "restrict" }),
+  updatedByUserId: uuid("updated_by_user_id").references(() => users.id, {
+    onDelete: "restrict",
+  }),
   status: animeStatusEnum("status").notNull().default(AnimeStatusEnum.PENDING),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -47,9 +51,15 @@ export const topics = pgTable("topics", {
   id: uuid("id").defaultRandom().primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  animeId: uuid("anime_id").notNull(),
-  createdByUserId: uuid("created_by_user_id").notNull(),
-  updatedByUserId: uuid("updated_by_user_id"),
+  animeId: uuid("anime_id")
+    .notNull()
+    .references(() => animes.id, { onDelete: "restrict" }),
+  createdByUserId: uuid("created_by_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "restrict" }),
+  updatedByUserId: uuid("updated_by_user_id").references(() => users.id, {
+    onDelete: "restrict",
+  }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   comments: integer("comments").default(0).notNull(),
@@ -58,8 +68,12 @@ export const topics = pgTable("topics", {
 export const comments = pgTable("comments", {
   id: uuid("id").defaultRandom().primaryKey(),
   content: text("content").notNull(),
-  topicId: uuid("topic_id").notNull(),
-  createdByUserId: uuid("created_by_user_id").notNull(),
+  topicId: uuid("topic_id")
+    .notNull()
+    .references(() => topics.id, { onDelete: "restrict" }),
+  createdByUserId: uuid("created_by_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "restrict" }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

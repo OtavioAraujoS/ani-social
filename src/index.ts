@@ -11,6 +11,7 @@ import { cors } from "@elysiajs/cors";
 import { PaginationQuerySchema } from "./interfaces/Pagination";
 import { SuccessResponseSchema } from "./interfaces/Success";
 import { ProfileController } from "./modules/profile/profile.controller";
+import { ScriptsController } from "./modules/scripts/scripts.controller";
 
 const app = new Elysia()
   .use(cors())
@@ -63,6 +64,7 @@ const app = new Elysia()
   .group("topics", (app) => app.use(TopicController))
   .group("comments", (app) => app.use(CommentsController))
   .group("/profile", (app) => app.use(ProfileController))
+  .group("/scripts", (app) => app.use(ScriptsController))
   .listen(3333);
 
 console.log(

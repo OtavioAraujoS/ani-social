@@ -88,7 +88,10 @@ export const UserService = {
           .where(eq(users.id, userId));
       }
     } catch (error) {
-      console.error(`Erro ao sincronizar rank do usuário ${userId}:`, error);
+      if (error instanceof Error) throw error;
+      throw new Error("Não foi possível sincronizar o rank do usuário.", {
+        cause: error,
+      });
     }
   },
 
@@ -114,6 +117,7 @@ export const UserService = {
         .limit(limit)
         .offset((page - 1) * limit);
     } catch (error) {
+      if (error instanceof Error) throw error;
       throw new Error("Não foi possível listar os usuários - " + error, {
         cause: error,
       });
@@ -144,6 +148,7 @@ export const UserService = {
         cause: "Usuário não encontrado ou não autorizado.",
       });
     } catch (error) {
+      if (error instanceof Error) throw error;
       throw new Error("Não foi possível encontrar o usuário - " + error, {
         cause: error,
       });
@@ -169,6 +174,7 @@ export const UserService = {
         code: 201,
       };
     } catch (error) {
+      if (error instanceof Error) throw error;
       throw new Error("Não foi possível criar o usuário - " + error, {
         cause: error,
       });
@@ -219,7 +225,7 @@ export const UserService = {
         cause: "Usuário não encontrado ou não autorizado.",
       });
     } catch (error) {
-      console.error("DIAGNOSTICO UPDATE:", { error, userId, userLoggedId });
+      if (error instanceof Error) throw error;
       throw new Error("Não foi possível atualizar o usuário - " + error, {
         cause: error,
       });
@@ -262,6 +268,7 @@ export const UserService = {
         cause: "Usuário não encontrado ou não autorizado.",
       });
     } catch (error) {
+      if (error instanceof Error) throw error;
       throw new Error(
         "Não foi possível atualizar a senha do usuário- " + error,
         {
@@ -310,6 +317,7 @@ export const UserService = {
         cause: "Usuário não encontrado ou não autorizado.",
       });
     } catch (error) {
+      if (error instanceof Error) throw error;
       throw new Error("Não foi possível atualizar o avatar- " + error, {
         cause: error,
       });
@@ -348,6 +356,7 @@ export const UserService = {
         cause: "Usuário não encontrado ou não autorizado.",
       });
     } catch (error) {
+      if (error instanceof Error) throw error;
       throw new Error("Não foi possível remover o usuário - " + error, {
         cause: error,
       });
